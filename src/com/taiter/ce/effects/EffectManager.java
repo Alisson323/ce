@@ -97,20 +97,8 @@ public class EffectManager {
     }
 
     public static void playSound(Location loc, String sound, float volume, float pitch) {
-        Sound s;
-
-        try {
-            s = Sound.valueOf(sound);
-        } catch (IllegalArgumentException ex) {
-            try {
-                //Try to resolve the 1.8 Sounds
-                s = Sound.valueOf(sound.substring(sound.indexOf("_") + 1, sound.length()).replace("_AMBIENT", "").replace("GENERIC_", "").replace("EXPERIENCE_", "").replace("PLAYER_", ""));
-            } catch (IllegalArgumentException ex2) {
-                return;
-            }
-        }
-
-        loc.getWorld().playSound(loc, s, volume, pitch);
+        com.cryptomorin.xseries.XSound.matchXSound(sound)
+                .ifPresent(xs -> xs.play(loc, volume, pitch));
     }
 
     public static void sendBlockEffect(List<Player> targets, Location loc, Vector offset, int blockID, float speed, int amount, byte data) {

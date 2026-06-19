@@ -34,6 +34,8 @@ Menu:
     RepulsedAnvilItem: "&cO item esta sendo repulsado pela Bigorna"
     NotPermittedUseThis: "&cVoce nao tem permissao para usar isto"
     NotImplemented: "&cEste recurso ainda nao esta implementado."
+    Bleeding: "&cVoce esta sangrando!"
+    StoppedBleeding: "&aVoce parou de sangrar!"
 
 Commands:
   Usage: "&cUso Correto: /ce <Reload/List/Remove/Enchant/Menu/Change/Give/Update>"

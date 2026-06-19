@@ -1,6 +1,7 @@
 package com.taiter.ce.effects;
 
 import com.taiter.ce.Main;
+import com.taiter.ce.utils.Translator;
 import java.util.Random;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -84,7 +85,7 @@ public class VisualEffects {
     }
 
     public static void applyBleed(final Player target, final int bleedDuration) {
-        target.sendMessage(ChatColor.RED + "You are Bleeding!");
+        target.sendMessage(Translator.get("Menu.Messages.Bleeding", ChatColor.RED + "You are Bleeding!"));
         target.setMetadata("ce.bleed", new FixedMetadataValue(Main.plugin, null));
         new BukkitRunnable() {
             int seconds = bleedDuration;
@@ -101,7 +102,7 @@ public class VisualEffects {
                     }
                 } else {
                     target.removeMetadata("ce.bleed", Main.plugin);
-                    target.sendMessage(ChatColor.GREEN + "You have stopped Bleeding!");
+                    target.sendMessage(Translator.get("Menu.Messages.StoppedBleeding", ChatColor.GREEN + "You have stopped Bleeding!"));
                     this.cancel();
                 }
             }

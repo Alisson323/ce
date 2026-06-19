@@ -34,6 +34,8 @@ Menu:
     RepulsedAnvilItem: "&cThe item is being repulsed by the Anvil"
     NotPermittedUseThis: "&cYou are not permitted to use this"
     NotImplemented: "&cThis feature is not yet implemented."
+    Bleeding: "&cYou are Bleeding!"
+    StoppedBleeding: "&aYou have stopped Bleeding!"
 
 Commands:
   Usage: "&cCorrect Usage: /ce <Reload/List/Remove/Enchant/Menu/Change/Give/Update>"

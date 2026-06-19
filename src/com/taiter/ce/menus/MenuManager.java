@@ -18,6 +18,8 @@ import com.taiter.ce.Enchantments.CEnchantment;
 import com.taiter.ce.Enchantments.CEnchantment.Application;
 import com.taiter.ce.Enchantments.EnchantManager;
 
+import com.cryptomorin.xseries.XMaterial;
+
 public class MenuManager {
 
     public static Inventory getPreviousInventory(String name) {
@@ -123,7 +125,7 @@ public class MenuManager {
     }
 
     public static void generateInventories() {
-        ItemStack backButton = new ItemStack(Material.NETHER_STAR);
+        ItemStack backButton = XMaterial.NETHER_STAR.parseItem();
         ItemMeta tempMeta = backButton.getItemMeta();
         List<String> tempLore = new ArrayList<>();
 
@@ -133,9 +135,9 @@ public class MenuManager {
         String itemPrefix = ChatColor.AQUA + "" + ChatColor.BOLD;
 
         Inventory MainMenu = Bukkit.createInventory(null, 9, Tools.prefix + Translator.get("Menu.Title.MainMenu", "Main Menu"));
-        ItemStack Enchantments = new ItemStack(Material.ENCHANTED_BOOK);
-        ItemStack Items = new ItemStack(Material.ENDER_PORTAL_FRAME);
-        ItemStack Runecrafting = new ItemStack(Material.ENCHANTMENT_TABLE);
+        ItemStack Enchantments = XMaterial.ENCHANTED_BOOK.parseItem();
+        ItemStack Items = XMaterial.END_PORTAL_FRAME.parseItem();
+        ItemStack Runecrafting = XMaterial.ENCHANTING_TABLE.parseItem();
 
         tempMeta.setDisplayName(itemPrefix + Translator.get("Menu.Title.Enchantments", "Enchantments"));
         tempMeta.setLore(Translator.getStringList("Menu.Buttons.EnchantmentsLore"));
@@ -158,12 +160,12 @@ public class MenuManager {
 
         Inventory EnchantmentMenu = Bukkit.createInventory(null, 9, Tools.prefix + Translator.get("Menu.Title.Enchantments", "Enchantments"));
         EnchantmentMenu.setItem(8, backButton);
-        ItemStack Global = new ItemStack(Material.ENCHANTED_BOOK);
-        ItemStack Bow = new ItemStack(Material.BOW);
-        ItemStack Armor = new ItemStack(Material.ANVIL);
-        ItemStack Tool = new ItemStack(Material.SHEARS);
-        ItemStack Helmet = new ItemStack(Material.DIAMOND_HELMET);
-        ItemStack Boots = new ItemStack(Material.DIAMOND_BOOTS);
+        ItemStack Global = XMaterial.ENCHANTED_BOOK.parseItem();
+        ItemStack Bow = XMaterial.BOW.parseItem();
+        ItemStack Armor = XMaterial.ANVIL.parseItem();
+        ItemStack Tool = XMaterial.SHEARS.parseItem();
+        ItemStack Helmet = XMaterial.DIAMOND_HELMET.parseItem();
+        ItemStack Boots = XMaterial.DIAMOND_BOOTS.parseItem();
 
         tempMeta.setDisplayName(itemPrefix + Translator.get("Menu.Title.Global", "Global"));
         tempMeta.setLore(null);
@@ -197,7 +199,7 @@ public class MenuManager {
         ArmorMenu.setItem(35, backButton);
 
         int current = 0;
-        ItemStack tempItem = new ItemStack(Material.ENCHANTED_BOOK);
+        ItemStack tempItem = XMaterial.ENCHANTED_BOOK.parseItem();
         for (CEnchantment ce : EnchantManager.getEnchantments())
             if (ce.getApplication() == Application.ARMOR) {
                 tempMeta.setDisplayName(ce.getDisplayName());
@@ -306,7 +308,7 @@ public class MenuManager {
 
     public static void openLevelSelectionMenu(Player p, ItemStack clickedItem) {
         Inventory levelMenu = Bukkit.createInventory(p, 9, Tools.prefix + Translator.get("Menu.Title.LevelSelection", "Level selection"));
-        ItemStack backButton = new ItemStack(Material.NETHER_STAR);
+        ItemStack backButton = XMaterial.NETHER_STAR.parseItem();
         ItemMeta tempMeta = backButton.getItemMeta();
         List<String> tempLore = new ArrayList<>();
 

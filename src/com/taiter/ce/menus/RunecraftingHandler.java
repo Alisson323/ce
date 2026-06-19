@@ -22,6 +22,8 @@ import com.taiter.ce.effects.EffectManager.ParticleEffect;
 import com.taiter.ce.Enchantments.CEnchantment;
 import com.taiter.ce.Enchantments.EnchantManager;
 
+import com.cryptomorin.xseries.XMaterial;
+
 public class RunecraftingHandler {
 
     private static final boolean stackEnchantments = Main.config.getBoolean("Global.Runecrafting.CanStackEnchantments");
@@ -155,8 +157,8 @@ public class RunecraftingHandler {
 
                     inv.clear();
 
-                    if (!result.getType().equals(Material.ENCHANTED_BOOK) && transform) {
-                        final ItemStack transformation = new ItemStack(Material.POTATO);
+                    if (!result.getType().equals(XMaterial.ENCHANTED_BOOK.parseMaterial()) && transform) {
+                        final ItemStack transformation = XMaterial.POTATO.parseItem();
                         ItemMeta tim = transformation.getItemMeta();
                         tim.setDisplayName(Translator.get("Runecrafting.Transforming", ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "Transforming..."));
                         transformation.setItemMeta(tim);
@@ -252,7 +254,7 @@ public class RunecraftingHandler {
                 int levelCost = 0;
                 double moneyCost = 0;
 
-                if (disenchanting && top.getType().equals(Material.BOOK) && !bot.getType().equals(Material.ENCHANTED_BOOK)) {
+                if (disenchanting && top.getType().equals(XMaterial.BOOK.parseMaterial()) && !bot.getType().equals(XMaterial.ENCHANTED_BOOK.parseMaterial())) {
                     HashMap<CEnchantment, Integer> enchs = EnchantManager.getEnchantmentLevels(bot.getItemMeta().getLore());
 
                     for (CEnchantment ce : enchs.keySet()) {
@@ -280,7 +282,7 @@ public class RunecraftingHandler {
                     return;
                 }
 
-                if (top.getType().equals(Material.BOOK)) {
+                if (top.getType().equals(XMaterial.BOOK.parseMaterial())) {
                     return;
                 }
 
@@ -370,7 +372,7 @@ public class RunecraftingHandler {
                         im.setDisplayName(Translator.get("Runecrafting.Incompatible", ChatColor.DARK_RED + "Incompatible Enchantment"));
                         im.setLore(new ArrayList<String>());
                         item.setItemMeta(im);
-                        item.setType(Material.BARRIER);
+                        item.setType(XMaterial.BARRIER.parseMaterial());
                         inv.setItem(2, item);
                     }
                     return;
