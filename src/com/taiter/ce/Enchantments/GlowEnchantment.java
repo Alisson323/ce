@@ -57,5 +57,15 @@ public class GlowEnchantment extends Enchantment {
 	public int getStartLevel() {
 		return 0;
 	}
+
+	@Override
+	public boolean isCursed() {
+		return false;
+	}
+
+	@Override
+	public boolean isTreasure() {
+		return false;
+	}
 	
 }
