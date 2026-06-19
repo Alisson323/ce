@@ -29,7 +29,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.taiter.ce.Tools;
+import com.taiter.ce.utils.Tools;
 import com.taiter.ce.Enchantments.CEnchantment;
 
 public class Explosive extends CEnchantment {

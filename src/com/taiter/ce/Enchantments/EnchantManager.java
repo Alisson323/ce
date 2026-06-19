@@ -175,11 +175,10 @@ public class EnchantManager {
      * @return The enchantment specified by originalName
      */
     public static CEnchantment getInternalEnchantment(String originalName) {
-        for (CEnchantment ce : enchantments) {
-            if (ce.getOriginalName().equals(originalName))
-                return ce;
-        }
-        return null;
+        return enchantments.stream()
+                .filter(ce -> ce.getOriginalName().equals(originalName))
+                .findFirst()
+                .orElse(null);
     }
 
     public static CEnchantment getEnchantment(String name) {
@@ -245,9 +244,7 @@ public class EnchantManager {
     public static Boolean hasEnchantments(ItemStack toTest) {
         if (toTest != null)
             if (toTest.hasItemMeta() && toTest.getItemMeta().hasLore())
-                for (String s : toTest.getItemMeta().getLore())
-                    if (containsEnchantment(s))
-                        return true;
+                return toTest.getItemMeta().getLore().stream().anyMatch(EnchantManager::containsEnchantment);
         return false;
     }
 
@@ -269,25 +266,15 @@ public class EnchantManager {
     }
 
     public static Boolean containsEnchantment(List<String> toTest) {
-        for (String s : toTest)
-            if (containsEnchantment(s))
-                return true;
-        return false;
+        return toTest.stream().anyMatch(EnchantManager::containsEnchantment);
     }
 
     public static Boolean containsEnchantment(String toTest) {
-        for (CEnchantment ce : enchantments) {
-            if (containsEnchantment(toTest, ce))
-                return true;
-        }
-        return false;
+        return enchantments.stream().anyMatch(ce -> containsEnchantment(toTest, ce));
     }
 
     public static Boolean containsEnchantment(List<String> toTest, CEnchantment ce) {
-        for (String s : toTest)
-            if (containsEnchantment(s, ce))
-                return true;
-        return false;
+        return toTest.stream().anyMatch(s -> containsEnchantment(s, ce));
     }
 
     public static Boolean containsEnchantment(String toTest, CEnchantment ce) {
@@ -333,54 +320,11 @@ public class EnchantManager {
     }
 
     public static String intToLevel(int i) {
-        String level = "I";
-
-        if (i == 2)
-            level = "II";
-        else if (i == 3)
-            level = "III";
-        else if (i == 4)
-            level = "IV";
-        else if (i == 5)
-            level = "V";
-        else if (i == 6)
-            level = "VI";
-        else if (i == 7)
-            level = "VII";
-        else if (i == 8)
-            level = "VIII";
-        else if (i == 9)
-            level = "IX";
-        else if (i == 10)
-            level = "X";
-
-        return level;
+        return LevelConverter.intToLevel(i);
     }
 
     public static int levelToInt(String level) {
-        level = level.toUpperCase();
-        int intLevel = 1;
-
-        if (level.equals("II"))
-            intLevel = 2;
-        else if (level.equals("III"))
-            intLevel = 3;
-        else if (level.equals("IV"))
-            intLevel = 4;
-        else if (level.equals("V"))
-            intLevel = 5;
-        else if (level.equals("VI"))
-            intLevel = 6;
-        else if (level.equals("VII"))
-            intLevel = 7;
-        else if (level.equals("VIII"))
-            intLevel = 8;
-        else if (level.equals("IX"))
-            intLevel = 9;
-        else if (level.equals("X"))
-            intLevel = 10;
-
-        return intLevel;
+        return LevelConverter.levelToInt(level);
     }
 
     public static String getEnchantBookName() {

@@ -30,7 +30,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
-import com.taiter.ce.EffectManager;
+import com.taiter.ce.effects.EffectManager;
 import com.taiter.ce.Enchantments.CEnchantment;
 
 public class Stomp extends CEnchantment {

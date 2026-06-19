@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.taiter.ce.EffectManager;
+import com.taiter.ce.effects.EffectManager;
 import com.taiter.ce.Enchantments.CEnchantment;
 
 

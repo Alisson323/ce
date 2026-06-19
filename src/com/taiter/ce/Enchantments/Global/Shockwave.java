@@ -32,7 +32,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.taiter.ce.Tools;
+import com.taiter.ce.utils.Tools;
 import com.taiter.ce.Enchantments.CEnchantment;
 
 public class Shockwave extends CEnchantment {

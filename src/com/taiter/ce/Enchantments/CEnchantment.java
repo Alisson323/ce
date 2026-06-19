@@ -31,7 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.taiter.ce.CBasic;
 import com.taiter.ce.Main;
-import com.taiter.ce.Tools;
+import com.taiter.ce.utils.Tools;
 
 public abstract class CEnchantment extends CBasic {
 

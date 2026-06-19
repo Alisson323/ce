@@ -31,7 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.taiter.ce.CBasic;
 import com.taiter.ce.Main;
-import com.taiter.ce.Tools;
+import com.taiter.ce.utils.Tools;
 
 public abstract class CItem extends CBasic {
 
@@ -98,21 +98,13 @@ public abstract class CItem extends CBasic {
     // Cooldown
 
     public boolean getHasCooldown(Player p) {
-        if (cooldown.contains(p))
-            return true;
-        return false;
+        return cooldown.contains(p);
     }
 
     public void generateCooldown(final Player p, long cooldownT) {
         if (cooldownT != 0) {
             cooldown.add(p);
-
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    cooldown.remove(p);
-                }
-            }.runTaskLater(main, cooldownT);
+            main.getServer().getScheduler().runTaskLater(main, () -> cooldown.remove(p), cooldownT);
         }
     }
 
@@ -144,8 +136,7 @@ public abstract class CItem extends CBasic {
         this.cooldownTime = Long.parseLong(Main.config.getString("Items." + getOriginalName() + ".Cooldown"));
         this.cost = Double.parseDouble(Main.config.getString("Items." + getOriginalName() + ".Cost"));
 
-        for (String s : description)
-            description.set(description.indexOf(s), ChatColor.GRAY + "" + ChatColor.ITALIC + s);
+        description.replaceAll(s -> ChatColor.GRAY + "" + ChatColor.ITALIC + s);
 
         //If the item has a special line, this whitespace is required
         this.description.add("");

@@ -1,0 +1,28 @@
+Global:
+ CreateExplosions: true
+ Updates:
+  ShowPercentageOnUpdate: true
+  CheckOnStartup: true
+  CheckDelay: 300
+ Logging:
+  Enabled: false
+  MinimumMsForLog: 1000
+  LogEvents: true
+  LogItems: true
+  LogEnchantments: true
+ Runecrafting:
+  Enabled: true
+  Disenchanting: true
+  CanStackEnchantments: true
+  TransformationEffect: true
+ Books:
+  Name: "&d&kedk&5 Magic Book &d&kedk"
+ Enchantments:
+  CEnchantmentColor: GRAY
+  CEnchantmentTable: true
+  CEnchantingProbability: 10
+  GlowEnchantmentID: 100
+  MaximumCustomEnchantments: 1000
+  UseCustomEnchantmentProbability: false
+  RequirePermissions: true
+Enchantments:

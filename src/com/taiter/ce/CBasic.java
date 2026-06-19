@@ -32,9 +32,9 @@ public abstract class CBasic {
 
     protected Plugin main = Main.plugin;
 
-    protected HashSet<Player> cooldown = new HashSet<Player>();
-    protected HashSet<Player> lockList = new HashSet<Player>();
-    protected HashSet<Trigger> triggers = new HashSet<Trigger>();
+    public HashSet<Player> cooldown = new HashSet<Player>();
+    public HashSet<Player> lockList = new HashSet<Player>();
+    public HashSet<Trigger> triggers = new HashSet<Trigger>();
 
     protected String displayName;
     protected String originalName;
@@ -43,7 +43,7 @@ public abstract class CBasic {
 
     protected HashMap<PotionEffectType, Integer> potionsOnWear = new HashMap<PotionEffectType, Integer>();
 
-    protected Map<String, Object> configEntries = new LinkedHashMap<String, Object>();
+    public Map<String, Object> configEntries = new LinkedHashMap<String, Object>();
 
     public Plugin getPlugin() {
         return this.main;

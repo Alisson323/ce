@@ -29,7 +29,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import com.taiter.ce.Main;
-import com.taiter.ce.Tools;
+import com.taiter.ce.utils.Tools;
 import com.taiter.ce.Enchantments.CEnchantment;
 
 

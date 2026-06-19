@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.taiter.ce.EffectManager;
+import com.taiter.ce.effects.EffectManager;
 import com.taiter.ce.Enchantments.CEnchantment;
 
 public class Headless extends CEnchantment {

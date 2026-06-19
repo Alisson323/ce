@@ -26,7 +26,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.taiter.ce.ReflectionHelper;
+import com.taiter.ce.utils.ReflectionHelper;
 import com.taiter.ce.Enchantments.CEnchantment;
 
 public class Shielded extends CEnchantment {

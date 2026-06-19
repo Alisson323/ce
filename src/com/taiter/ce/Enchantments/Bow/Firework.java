@@ -30,7 +30,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.taiter.ce.Tools;
+import com.taiter.ce.utils.Tools;
 import com.taiter.ce.Enchantments.CEnchantment;
 
 

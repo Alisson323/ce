@@ -33,7 +33,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.taiter.ce.EffectManager;
+import com.taiter.ce.effects.EffectManager;
 import com.taiter.ce.Main;
 import com.taiter.ce.Enchantments.CEnchantment;
 

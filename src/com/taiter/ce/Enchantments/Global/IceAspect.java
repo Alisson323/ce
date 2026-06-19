@@ -37,8 +37,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.taiter.ce.EffectManager;
-import com.taiter.ce.Tools;
+import com.taiter.ce.effects.EffectManager;
+import com.taiter.ce.utils.Tools;
 import com.taiter.ce.Enchantments.CEnchantment;
 
 public class IceAspect extends CEnchantment {
