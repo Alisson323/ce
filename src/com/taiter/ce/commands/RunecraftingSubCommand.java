@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import com.taiter.ce.Main;
+import com.taiter.ce.utils.Translator;
 
 public class RunecraftingSubCommand implements SubCommand {
     public RunecraftingSubCommand(com.taiter.ce.Main main) {
@@ -17,18 +17,18 @@ public class RunecraftingSubCommand implements SubCommand {
     @Override
     public String execute(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
-            return ChatColor.RED + "This command can only be used by players";
+            return Translator.get("Commands.OnlyPlayers", ChatColor.RED + "This command can only be executed by a Player.");
         }
 
         Player p = (Player) sender;
         String node = "ce.cmd.*";
         String requiredPermission = "ce.cmd.runecrafting";
         if (!sender.hasPermission(node) && !sender.hasPermission(requiredPermission) && !sender.isOp()) {
-            return ChatColor.RED + "You do not have permission to use this command.";
+            return Translator.get("Commands.NoPermission", ChatColor.RED + "You do not have permission to execute this command.");
         }
 
         Inventory inv = Bukkit.createInventory(p, InventoryType.FURNACE,
-                ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba");
+                ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + Translator.get("Runecrafting.Title", " Runecrafting ") + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba");
         inv.setContents(new ItemStack[]{new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR)});
 
         p.openInventory(inv);

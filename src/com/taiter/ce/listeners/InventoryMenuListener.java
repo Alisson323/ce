@@ -11,10 +11,10 @@ import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import com.taiter.ce.listeners.CEventHandler;
 import com.taiter.ce.Main;
 import com.taiter.ce.menus.RunecraftingHandler;
 import com.taiter.ce.utils.Tools;
+import com.taiter.ce.utils.Translator;
 import com.taiter.ce.menus.MenuManager;
 import com.taiter.ce.menus.MenuPurchaseHandler;
 import com.taiter.ce.Enchantments.EnchantManager;
@@ -25,11 +25,14 @@ public class InventoryMenuListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void inventoryMenuPrevention(InventoryDragEvent event) {
-        if (event.getView().getTopInventory().getTitle().startsWith("CE")) {
+        String title = event.getView().getTopInventory().getTitle();
+        if (title.startsWith("CE") || title.startsWith(Tools.prefix)) {
             event.setCancelled(true);
         } else if (useRuneCrafting) {
-            if (event.getView().getTopInventory().getName().equals(
-                    ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba")) {
+            String invName = event.getView().getTopInventory().getName();
+            String expected = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + Translator.get("Runecrafting.Title", " Runecrafting ") + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
+            String fallback = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
+            if (invName.equals(expected) || invName.equals(fallback)) {
                 RunecraftingHandler.updateRunecraftingInventory(event.getInventory());
             }
         }
@@ -37,15 +40,18 @@ public class InventoryMenuListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void inventoryMenuPrevention(InventoryCreativeEvent event) {
-        if (event.getView().getTopInventory().getTitle().startsWith("CE")) {
+        String title = event.getView().getTopInventory().getTitle();
+        if (title.startsWith("CE") || title.startsWith(Tools.prefix)) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void inventoryClose(InventoryCloseEvent event) {
-        if (event.getInventory().getName().equals(
-                ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba")) {
+        String invName = event.getInventory().getName();
+        String expected = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + Translator.get("Runecrafting.Title", " Runecrafting ") + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
+        String fallback = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
+        if (invName.equals(expected) || invName.equals(fallback)) {
             ItemStack[] contents = event.getInventory().getContents();
             HumanEntity p = event.getPlayer();
             org.bukkit.Location loc = p.getLocation().add(0, 1.25, 0);
@@ -74,8 +80,10 @@ public class InventoryMenuListener implements Listener {
         }
 
         if (useRuneCrafting) {
-            if (event.getView().getTopInventory().getName().equals(
-                    ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba")) {
+            String invName = event.getView().getTopInventory().getName();
+            String expected = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + Translator.get("Runecrafting.Title", " Runecrafting ") + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
+            String fallback = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
+            if (invName.equals(expected) || invName.equals(fallback)) {
                 RunecraftingHandler.handleRunecrafting(event);
                 return;
             }
@@ -92,9 +100,9 @@ public class InventoryMenuListener implements Listener {
             }
             if (toTest != null && !toTest.getType().equals(Material.AIR) && toTest.hasItemMeta()) {
                 if (EnchantManager.isEnchantmentBook(toTest)) {
-                    event.getWhoClicked().sendMessage(ChatColor.RED + "The book is being repulsed by the Anvil");
+                    event.getWhoClicked().sendMessage(Translator.get("Menu.Messages.RepulsedAnvil", ChatColor.RED + "The book is being repulsed by the Anvil"));
                 } else if (EnchantManager.hasEnchantments(toTest)) {
-                    event.getWhoClicked().sendMessage(ChatColor.RED + "The item is being repulsed by the Anvil");
+                    event.getWhoClicked().sendMessage(Translator.get("Menu.Messages.RepulsedAnvilItem", ChatColor.RED + "The item is being repulsed by the Anvil"));
                 } else {
                     return;
                 }
@@ -125,7 +133,8 @@ public class InventoryMenuListener implements Listener {
             return;
         }
 
-        if (event.getView().getTopInventory().getTitle().startsWith("CE")) {
+        String title = event.getView().getTopInventory().getTitle();
+        if (title.startsWith("CE") || title.startsWith(Tools.prefix)) {
             Inventory topInv = event.getView().getTopInventory();
             final Player p = (Player) event.getWhoClicked();
             ItemStack clickedItem = event.getCurrentItem();
@@ -139,13 +148,15 @@ public class InventoryMenuListener implements Listener {
             }
 
             if (event.getRawSlot() < topInv.getSize()) {
-                if (topInv.getTitle().equals(Tools.prefix + "Enchantments")) {
+                if (topInv.getTitle().equals(Tools.prefix + "Enchantments")
+                        || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Enchantments", "Enchantments"))) {
                     p.closeInventory();
                     p.openInventory(Tools.getEnchantmentMenu(p, clickedItem.getItemMeta().getDisplayName()));
                     return;
                 }
 
-                if (topInv.getTitle().equals(Tools.prefix + "Main Menu")) {
+                if (topInv.getTitle().equals(Tools.prefix + "Main Menu")
+                        || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.MainMenu", "Main Menu"))) {
                     if (event.getRawSlot() == 4) {
                         p.closeInventory();
                         p.openInventory(Tools.getItemMenu(p));
@@ -156,29 +167,35 @@ public class InventoryMenuListener implements Listener {
                             p.openInventory(Tools.getNextInventory(clickedItem.getItemMeta().getDisplayName()));
                             return;
                         } else {
-                            p.sendMessage(ChatColor.RED + "You do not have permission to use this!");
+                            p.sendMessage(Translator.get("Menu.Messages.NoPermissionUse", ChatColor.RED + "You do not have permission to use this!"));
                             return;
                         }
                     }
                 }
 
-                if (topInv.getTitle().equals(Tools.prefix + "Global") || topInv.getTitle().equals(Tools.prefix + "Bow") || topInv.getTitle().equals(Tools.prefix + "Armor")
-                        || topInv.getTitle().equals(Tools.prefix + "Helmet") || topInv.getTitle().equals(Tools.prefix + "Boots") || topInv.getTitle().equals(Tools.prefix + "Tool")) {
+                if (topInv.getTitle().equals(Tools.prefix + "Global") || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Global", "Global"))
+                        || topInv.getTitle().equals(Tools.prefix + "Bow") || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Bow", "Bow"))
+                        || topInv.getTitle().equals(Tools.prefix + "Armor") || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Armor", "Armor"))
+                        || topInv.getTitle().equals(Tools.prefix + "Helmet") || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Helmet", "Helmet"))
+                        || topInv.getTitle().equals(Tools.prefix + "Boots") || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Boots", "Boots"))
+                        || topInv.getTitle().equals(Tools.prefix + "Tool") || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Tool", "Tool"))) {
                     if (p.isOp() || Tools.checkPermission(EnchantManager.getEnchantment(clickedItem.getItemMeta().getDisplayName()), p)) {
                         MenuManager.openLevelSelectionMenu(p, clickedItem);
                         return;
                     } else {
-                        p.sendMessage(ChatColor.RED + "You do not have permission to buy this Enchantment.");
+                        p.sendMessage(Translator.get("Menu.Messages.NoPermissionBuy", ChatColor.RED + "You do not have permission to buy this Enchantment."));
                         return;
                     }
                 }
 
-                if (topInv.getTitle().equals(Tools.prefix + "Items")) {
+                if (topInv.getTitle().equals(Tools.prefix + "Items")
+                        || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Items", "Items"))) {
                     MenuPurchaseHandler.handlePurchaseItem(p, clickedItem);
                     return;
                 }
 
-                if (topInv.getTitle().equals(Tools.prefix + "Level selection")) {
+                if (topInv.getTitle().equals(Tools.prefix + "Level selection")
+                        || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.LevelSelection", "Level selection"))) {
                     MenuPurchaseHandler.handlePurchaseLevelSelection(p, clickedItem);
                     return;
                 }
@@ -189,7 +206,7 @@ public class InventoryMenuListener implements Listener {
                 try {
                     p.openInventory(Tools.getNextInventory(clickedItem.getItemMeta().getDisplayName()));
                 } catch (Exception e) {
-                    p.sendMessage(ChatColor.RED + "This feature is not yet implemented.");
+                    p.sendMessage(Translator.get("Menu.Messages.NotImplemented", ChatColor.RED + "This feature is not yet implemented."));
                 }
             }
         }

@@ -1,4 +1,5 @@
 com\taiter\ce\Enchantments\Helmet\Implants$1.class
+com\taiter\ce\utils\PermissionHelper.class
 com\taiter\ce\CItems\utilities\Firecracker$1.class
 com\taiter\ce\Enchantments\Armor\Revulsion.class
 com\taiter\ce\Enchantments\Bow\Firework.class
@@ -129,6 +130,7 @@ com\taiter\ce\Enchantments\Armor\ObsidianShield.class
 com\taiter\ce\CItems\bows\Minigun.class
 com\taiter\ce\commands\SubCommand.class
 com\taiter\ce\Enchantments\Global\Gooey.class
+com\taiter\ce\utils\Translator.class
 com\taiter\ce\Enchantments\Bow\Blaze.class
 com\taiter\ce\Enchantments\Bow\Lightning.class
 com\taiter\ce\Enchantments\Global\Lifesteal.class

@@ -1,6 +1,5 @@
 package com.taiter.ce.listeners;
 
-import com.taiter.ce.CItems.traps.Landmine;
 import com.taiter.ce.utils.Tools;
 import com.taiter.ce.Main;
 import com.taiter.ce.CBasic;
@@ -28,7 +27,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 import com.taiter.ce.CBasic.Trigger;
 import com.taiter.ce.CItems.CItem;
 import com.taiter.ce.CItems.bows.HookshotBow;

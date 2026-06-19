@@ -2,9 +2,7 @@ package com.taiter.ce.listeners;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -13,7 +11,6 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
-import com.taiter.ce.listeners.CEventHandler;
 import com.taiter.ce.Main;
 import com.taiter.ce.utils.Tools;
 import com.taiter.ce.Enchantments.CEnchantment;

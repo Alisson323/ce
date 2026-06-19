@@ -17,7 +17,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
-import com.taiter.ce.listeners.CEventHandler;
 import com.taiter.ce.Main;
 import com.taiter.ce.utils.Tools;
 import com.taiter.ce.CItems.CItem;

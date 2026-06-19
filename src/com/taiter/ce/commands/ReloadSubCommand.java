@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import com.taiter.ce.Main;
 import com.taiter.ce.utils.Tools;
+import com.taiter.ce.utils.Translator;
 import com.taiter.ce.Enchantments.EnchantManager;
 
 public class ReloadSubCommand implements SubCommand {
@@ -18,11 +19,12 @@ public class ReloadSubCommand implements SubCommand {
         String node = "ce.cmd.*";
         String requiredPermission = "ce.cmd.reload";
         if (!sender.hasPermission(node) && !sender.hasPermission(requiredPermission) && !sender.isOp()) {
-            return ChatColor.RED + "You do not have permission to use this command.";
+            return Translator.get("Commands.NoPermission", ChatColor.RED + "You do not have permission to execute this command.");
         }
 
         Main.plugin.reloadConfig();
         Main.config = Main.plugin.getConfig();
+        Translator.init(Main.plugin);
 
         EnchantManager.getEnchantments().clear();
         Main.items.clear();
@@ -36,6 +38,6 @@ public class ReloadSubCommand implements SubCommand {
 
         Tools.generateInventories();
 
-        return ChatColor.GREEN + "The Custom Enchantments config has been reloaded successfully.";
+        return Translator.get("Commands.ReloadSuccess", ChatColor.GREEN + "The Custom Enchantments config has been reloaded successfully.");
     }
 }

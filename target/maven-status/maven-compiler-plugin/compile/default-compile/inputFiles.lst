@@ -11,6 +11,7 @@ C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\ta
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\CItems\bows\BeastmastersBow.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\utils\ReflectionHelper.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\commands\ReloadSubCommand.java
+C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\utils\Translator.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\commands\MenuSubCommand.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\Enchantments\Armor\Drunk.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\Enchantments\Global\Aerial.java
@@ -49,6 +50,7 @@ C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\ta
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\CBasic.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\Enchantments\Bow\Volley.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\Enchantments\Global\Wither.java
+C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\utils\PermissionHelper.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\Enchantments\Tool\Smelting.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\listeners\EntityEventListener.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\Enchantments\Armor\Molten.java

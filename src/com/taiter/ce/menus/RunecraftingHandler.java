@@ -1,6 +1,7 @@
 package com.taiter.ce.menus;
 
 import com.taiter.ce.utils.Tools;
+import com.taiter.ce.utils.Translator;
 import com.taiter.ce.Main;
 import com.taiter.ce.effects.EffectManager;
 import java.util.ArrayList;
@@ -78,53 +79,72 @@ public class RunecraftingHandler {
                 if (result != null && !result.getType().equals(Material.AIR)) {
                     if (result.hasItemMeta() && result.getItemMeta().hasDisplayName()
                             && (result.getItemMeta().getDisplayName().equals(ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "Transforming...")
-                                    || result.getItemMeta().getDisplayName().equals(ChatColor.DARK_RED + "Incompatible Enchantment")))
+                                    || result.getItemMeta().getDisplayName().equals(ChatColor.DARK_RED + "Incompatible Enchantment")
+                                    || result.getItemMeta().getDisplayName().equals(Translator.get("Runecrafting.Transforming"))
+                                    || result.getItemMeta().getDisplayName().equals(Translator.get("Runecrafting.Incompatible"))))
                         return;
 
                     final Player p = (Player) event.getWhoClicked();
                     ItemMeta im = result.getItemMeta();
                     List<String> lore = im.getLore();
 
-                    if (lore.get(lore.size() - 1).startsWith(ChatColor.GRAY + "Cost: ")) {
+                    String costPrefix = Translator.get("Commands.CostPrefix", "Cost: ");
+                    String costPrefixFallback = ChatColor.GRAY + "Cost: ";
+
+                    if (lore != null && !lore.isEmpty() && (lore.get(lore.size() - 1).startsWith(costPrefix) || lore.get(lore.size() - 1).startsWith(costPrefixFallback))) {
                         int levelCost = 0;
                         double moneyCost = 0;
-                        String[] costSplit = ChatColor.stripColor(lore.get(lore.size() - 1)).split(" ");
-                        String resultString = ChatColor.WHITE + "" + ChatColor.BOLD + costSplit[1];
+                        String lastLoreLine = lore.get(lore.size() - 1);
+                        String cleanCost = ChatColor.stripColor(lastLoreLine);
 
-                        if (costSplit.length >= 3 && costSplit[2].equals("Levels")) {
-                            levelCost = Integer.parseInt(costSplit[1]);
-                            resultString += " Levels";
-                            if (costSplit.length >= 4) {
-                                moneyCost = Double.parseDouble(costSplit[3]);
-                                resultString += ChatColor.GREEN + " and " + ChatColor.WHITE + ChatColor.BOLD + costSplit[3];
-                                for (int i = 4; i < costSplit.length; i++)
-                                    resultString += " " + costSplit[i];
+                        String costPrefixClean = ChatColor.stripColor(costPrefix).trim();
+                        String costPrefixFallbackClean = "Cost:";
+
+                        cleanCost = cleanCost.replace(costPrefixClean, "").replace(costPrefixFallbackClean, "").trim();
+
+                        String[] costSplit = cleanCost.split(" ");
+                        String resultString = "";
+
+                        String levelsLabel = ChatColor.stripColor(Translator.get("Commands.Levels", " Levels ")).trim();
+                        String levelsLabelFallback = "Levels";
+
+                        if (cleanCost.contains(levelsLabel) || cleanCost.contains(levelsLabelFallback)) {
+                            levelCost = Integer.parseInt(costSplit[0]);
+                            resultString += ChatColor.WHITE + "" + ChatColor.BOLD + levelCost + " " + Translator.get("Commands.Levels", " Levels ");
+                            if (costSplit.length >= 3) {
+                                try {
+                                    moneyCost = Double.parseDouble(costSplit[2]);
+                                    resultString += ChatColor.GREEN + " " + Translator.get("Commands.And", "and") + " " + ChatColor.WHITE + ChatColor.BOLD + moneyCost + " " + (Main.hasEconomy ? Main.econ.currencyNamePlural() : "");
+                                } catch (NumberFormatException ex) {
+                                    // Ignorar se não for número
+                                }
                             }
                         } else {
-                            moneyCost = Double.parseDouble(costSplit[1]);
-                            if (costSplit.length >= 3)
-                                resultString += costSplit[2];
-                            for (int i = 3; i < costSplit.length; i++)
-                                resultString += " " + costSplit[i];
+                            try {
+                                moneyCost = Double.parseDouble(costSplit[0]);
+                                resultString += ChatColor.WHITE + "" + ChatColor.BOLD + moneyCost + " " + (Main.hasEconomy ? Main.econ.currencyNamePlural() : "");
+                            } catch (NumberFormatException ex) {
+                                // Ignorar se não for número
+                            }
                         }
 
-                        if (!p.getGameMode().equals(GameMode.CREATIVE))
-                            if (p.getLevel() >= levelCost)
-                                p.setLevel(p.getLevel() - levelCost);
-                            else {
-                                p.sendMessage(ChatColor.RED + "Your level is not high enough!");
+                        if (!p.getGameMode().equals(GameMode.CREATIVE)) {
+                            if (p.getLevel() < levelCost) {
+                                p.sendMessage(Translator.get("Runecrafting.LevelNotHighEnough", ChatColor.RED + "Your level is not high enough!"));
                                 return;
                             }
+                            p.setLevel(p.getLevel() - levelCost);
+                        }
 
-                        if (moneyCost > 0)
-                            if (Main.econ.getBalance(p.getName()) >= moneyCost)
-                                Main.econ.withdrawPlayer(p.getName(), moneyCost);
-                            else {
-                                p.sendMessage(ChatColor.RED + "You do not have enough money!");
+                        if (moneyCost > 0 && Main.hasEconomy) {
+                            if (Main.econ.getBalance(p.getName()) < moneyCost) {
+                                p.sendMessage(Translator.get("Runecrafting.NotEnoughMoney", ChatColor.RED + "You do not have enough money!"));
                                 return;
                             }
+                            Main.econ.withdrawPlayer(p.getName(), moneyCost);
+                        }
 
-                        p.sendMessage(ChatColor.GREEN + "Used " + resultString + ChatColor.GREEN + " for the transformation.");
+                        p.sendMessage(Translator.get("Runecrafting.Transformed", ChatColor.GREEN + "Used %item% for the transformation.").replace("%item%", resultString));
 
                         lore = lore.subList(0, lore.size() - 2);
                         im.setLore(lore);
@@ -138,7 +158,7 @@ public class RunecraftingHandler {
                     if (!result.getType().equals(Material.ENCHANTED_BOOK) && transform) {
                         final ItemStack transformation = new ItemStack(Material.POTATO);
                         ItemMeta tim = transformation.getItemMeta();
-                        tim.setDisplayName(ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "Transforming...");
+                        tim.setDisplayName(Translator.get("Runecrafting.Transforming", ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "Transforming..."));
                         transformation.setItemMeta(tim);
 
                         final List<Player> targets = new ArrayList<>();
@@ -155,8 +175,9 @@ public class RunecraftingHandler {
                             public void run() {
                                 if (counter <= 0) {
                                     inv.setItem(2, new ItemStack(Material.AIR));
-                                    if (p.getOpenInventory() != null && p.getOpenInventory().getTitle().equals(ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET
-                                             + ChatColor.DARK_PURPLE + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba"))
+                                    String expectedTitle = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + Translator.get("Runecrafting.Title", " Runecrafting ") + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
+                                    String expectedTitleFallback = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
+                                    if (p.getOpenInventory() != null && (p.getOpenInventory().getTitle().equals(expectedTitle) || p.getOpenInventory().getTitle().equals(expectedTitleFallback)))
                                         p.setItemOnCursor(result);
                                     else
                                         p.getInventory().addItem(result);
@@ -190,11 +211,9 @@ public class RunecraftingHandler {
                 topItem.setAmount(1);
 
                 if (EnchantManager.isEnchantmentBook(current) || EnchantManager.hasEnchantments(current)) {
-                    if (current.getAmount() > 1) {
-                        current.setAmount(current.getAmount() - 1);
-                    } else if (current.getAmount() == 1) {
+                    current.setAmount(current.getAmount() - 1);
+                    if (current.getAmount() == 0)
                         current.setType(Material.AIR);
-                    }
                     if (top.getItem(1) == null || top.getItem(1).getType().equals(Material.AIR)) {
                         top.setItem(1, topItem);
                         event.setCurrentItem(current);
@@ -205,11 +224,9 @@ public class RunecraftingHandler {
                         updateRunecraftingInventory(top);
                     }
                 } else if (EnchantManager.isEnchantable(current.getType().toString())) {
-                    if (current.getAmount() > 1) {
-                        current.setAmount(current.getAmount() - 1);
-                    } else if (current.getAmount() == 1) {
+                    current.setAmount(current.getAmount() - 1);
+                    if (current.getAmount() == 0)
                         current.setType(Material.AIR);
-                    }
                     if ((top.getItem(0) == null || top.getItem(0).getType().equals(Material.AIR))) {
                         top.setItem(0, topItem);
                         event.setCurrentItem(current);
@@ -252,14 +269,9 @@ public class RunecraftingHandler {
                     ItemMeta im = book.getItemMeta();
                     List<String> lore = im.getLore();
 
-                    String costString = ChatColor.GRAY + "Cost: " + (levelCost > 0 ? ChatColor.WHITE + "" + ChatColor.BOLD + levelCost + ChatColor.GOLD + " Levels " : "");
-                    if (Main.hasEconomy)
-                        costString += (moneyCost > 0
-                                ? ChatColor.WHITE + "" + ChatColor.BOLD + moneyCost + " " + ChatColor.GOLD + (moneyCost == 1 ? Main.econ.currencyNameSingular() : Main.econ.currencyNamePlural()) : "");
-
-                    if (!costString.endsWith("Cost: ")) {
+                    if (levelCost > 0 || moneyCost > 0) {
                         lore.add("");
-                        lore.add(costString);
+                        lore.add(getCostString(levelCost, moneyCost));
                         im.setLore(lore);
                         book.setItemMeta(im);
                     }
@@ -315,14 +327,9 @@ public class RunecraftingHandler {
                             ItemMeta im = book.getItemMeta();
                             List<String> lore = im.getLore();
 
-                            String costString = ChatColor.GRAY + "Cost: " + (levelCost > 0 ? ChatColor.WHITE + "" + ChatColor.BOLD + levelCost + ChatColor.GOLD + " Levels " : "");
-                            if (Main.hasEconomy)
-                                costString += (moneyCost > 0 ? ChatColor.WHITE + "" + ChatColor.BOLD + moneyCost + " " + ChatColor.GOLD
-                                        + (moneyCost == 1 ? Main.econ.currencyNameSingular() : Main.econ.currencyNamePlural()) : "");
-
-                            if (!costString.endsWith("Cost: ")) {
+                            if (levelCost > 0 || moneyCost > 0) {
                                 lore.add("");
-                                lore.add(costString);
+                                lore.add(getCostString(levelCost, moneyCost));
                                 im.setLore(lore);
                                 book.setItemMeta(im);
                             }
@@ -348,17 +355,11 @@ public class RunecraftingHandler {
                             item = EnchantManager.addEnchant(item, ce, newLevel);
                         }
                     if (EnchantManager.getEnchantments(item.getItemMeta().getLore()).size() > topList.size()) {
-                        String costString = ChatColor.GRAY + "Cost: " + (levelCost > 0 ? ChatColor.WHITE + "" + ChatColor.BOLD + levelCost + ChatColor.GOLD + " Levels " : "");
-                        if (Main.hasEconomy)
-                            costString += (moneyCost > 0
-                                    ? ChatColor.WHITE + "" + ChatColor.BOLD + moneyCost + " " + ChatColor.GOLD + (moneyCost == 1 ? Main.econ.currencyNameSingular() : Main.econ.currencyNamePlural())
-                                    : "");
-
-                        if (!costString.endsWith("Cost: ")) {
+                        if (levelCost > 0 || moneyCost > 0) {
                             ItemMeta im = item.getItemMeta();
                             List<String> lore = im.getLore();
                             lore.add("");
-                            lore.add(costString);
+                            lore.add(getCostString(levelCost, moneyCost));
                             im.setLore(lore);
                             item.setItemMeta(im);
                         }
@@ -366,7 +367,7 @@ public class RunecraftingHandler {
                         inv.setItem(2, item);
                     } else {
                         ItemMeta im = item.getItemMeta();
-                        im.setDisplayName(ChatColor.DARK_RED + "Incompatible Enchantment");
+                        im.setDisplayName(Translator.get("Runecrafting.Incompatible", ChatColor.DARK_RED + "Incompatible Enchantment"));
                         im.setLore(new ArrayList<String>());
                         item.setItemMeta(im);
                         item.setType(Material.BARRIER);
@@ -377,5 +378,21 @@ public class RunecraftingHandler {
                 inv.setItem(2, new ItemStack(Material.AIR));
             }
         }.runTaskLater(Main.plugin, 2);
+    }
+
+    private static String getCostString(int levelCost, double moneyCost) {
+        String costPrefix = Translator.get("Commands.CostPrefix", ChatColor.GRAY + "Cost: ");
+        String levelsLabel = Translator.get("Commands.Levels", " Levels ");
+        String andLabel = Translator.get("Commands.And", "and");
+
+        String costString = costPrefix + (levelCost > 0 ? ChatColor.WHITE + "" + ChatColor.BOLD + levelCost + ChatColor.GOLD + levelsLabel : "");
+        if (Main.hasEconomy && moneyCost > 0) {
+            String currency = (moneyCost == 1 ? Main.econ.currencyNameSingular() : Main.econ.currencyNamePlural());
+            if (levelCost > 0) {
+                costString += ChatColor.GREEN + " " + andLabel + " ";
+            }
+            costString += ChatColor.WHITE + "" + ChatColor.BOLD + moneyCost + " " + ChatColor.GOLD + currency;
+        }
+        return costString;
     }
 }

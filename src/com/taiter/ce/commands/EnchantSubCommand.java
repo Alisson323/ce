@@ -1,7 +1,6 @@
 package com.taiter.ce.commands;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -12,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import com.taiter.ce.Main;
 import com.taiter.ce.utils.Tools;
+import com.taiter.ce.utils.Translator;
 import com.taiter.ce.CBasic;
 import com.taiter.ce.CItems.CItem;
 import com.taiter.ce.CItems.utilities.Swimsuit;
@@ -26,18 +26,20 @@ public class EnchantSubCommand implements SubCommand {
     @Override
     public String execute(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
-            return ChatColor.RED + "This command can only be used by players";
+            return Translator.get("Commands.OnlyPlayers", ChatColor.RED + "This command can only be executed by a Player.");
         }
 
         Player p = (Player) sender;
         String node = "ce.cmd.*";
         String requiredPermission = "ce.cmd.enchant";
         if (!sender.hasPermission(node) && !sender.hasPermission(requiredPermission) && !sender.isOp()) {
-            return ChatColor.RED + "You do not have permission to use this command.";
+            return Translator.get("Commands.NoPermission", ChatColor.RED + "You do not have permission to execute this command.");
         }
 
         String isEnchantCmd = args[0].toLowerCase();
-        String usageError = ChatColor.RED + "Correct Usage: /ce " + (isEnchantCmd.startsWith("e") ? "enchant [Required Material] <Enchantment> <Level>" : "item <Item>");
+        String usageError = isEnchantCmd.startsWith("e")
+                ? Translator.get("Commands.EnchantUsage", ChatColor.RED + "Correct Usage: /ce enchant [Required Material] <Enchantment> <Level>")
+                : Translator.get("Commands.ItemUsage", ChatColor.RED + "Correct Usage: /ce item <Item>");
         if (args.length < 2) {
             return usageError;
         }
@@ -61,7 +63,7 @@ public class EnchantSubCommand implements SubCommand {
 
         if (test != null) {
             if (p.getItemInHand().getType() != test) {
-                return ChatColor.RED + "You do not have the right material to enchant this!";
+                return Translator.get("Commands.WrongMaterial", ChatColor.RED + "You do not have the right material to enchant this!");
             }
             start++;
             if (args.length > 2) {
@@ -72,7 +74,7 @@ public class EnchantSubCommand implements SubCommand {
         int level = 1;
         if (isEnchantCmd.startsWith("e")) {
             if (item.getType().equals(Material.AIR)) {
-                return ChatColor.RED + "You are not holding an item in your hand";
+                return Translator.get("Commands.NoItemHand", ChatColor.RED + "You do not have an item in your hand.");
             }
             try {
                 level = Integer.parseInt(args[args.length - 1]);
@@ -117,7 +119,7 @@ public class EnchantSubCommand implements SubCommand {
             }
 
             if (custom == null) {
-                return ChatColor.RED + "The item '" + customName + "' does not exist.";
+                return Translator.get("Commands.ItemNotFound", ChatColor.RED + "The specified Item could not be found.");
             }
         }
 
@@ -137,23 +139,27 @@ public class EnchantSubCommand implements SubCommand {
                     int newLevel = item.getEnchantmentLevel(ench) + level;
                     item.removeEnchantment(ench);
                     item.addUnsafeEnchantment(ench, newLevel);
-                    return ChatColor.GREEN + "You have succesfully increased the item's level of " + ench.getName() + " by " + level + ".";
+                    return Translator.get("Commands.VanillaEnchantLevelIncreased", ChatColor.GREEN + "You have successfully increased the level of %enchant% by %level%.")
+                            .replace("%enchant%", ench.getName()).replace("%level%", String.valueOf(level));
                 } else {
                     item.addUnsafeEnchantment(ench, level);
-                    return ChatColor.GREEN + "You have succesfully enchanted your item with " + ench.getName() + " level " + level + ".";
+                    return Translator.get("Commands.VanillaEnchanted", ChatColor.GREEN + "You have successfully enchanted your item with %enchant% level %level%.")
+                            .replace("%enchant%", ench.getName()).replace("%level%", String.valueOf(level));
                 }
             }
 
-            return ChatColor.RED + "The enchantment '" + customName + "' does not exist.";
+            return Translator.get("Commands.EnchantNotFound", ChatColor.RED + "The specified Enchantment could not be found.");
         }
 
         if (item.getType().equals(Material.BOOK) && custom instanceof CEnchantment) {
             p.setItemInHand(EnchantManager.getEnchantBook((CEnchantment) custom, level));
-            return ChatColor.GREEN + "You have created an enchanted book with '" + custom.getDisplayName() + ChatColor.GREEN + "' level " + level + "!";
+            return Translator.get("Commands.CreatedEnchantBook", ChatColor.GREEN + "You have created an enchanted book with %enchant% level %level%!")
+                    .replace("%enchant%", custom.getDisplayName()).replace("%level%", String.valueOf(level));
         }
 
         if (!Tools.checkPermission(custom, p)) {
-            return ChatColor.RED + "You do not have permission to use '" + customName + "'.";
+            return Translator.get("Commands.NoPermissionToUseEnchant", ChatColor.RED + "You do not have permission to use '%enchant%'.")
+                    .replace("%enchant%", customName);
         }
 
         List<String> lore = new ArrayList<>();
@@ -168,7 +174,7 @@ public class EnchantSubCommand implements SubCommand {
                             int newLevel = EnchantManager.getLevel(lore.get(i)) + level;
                             int maxLevel = ((CEnchantment) custom).getEnchantmentMaxLevel();
                             if (EnchantManager.getLevel(lore.get(i)) == maxLevel) {
-                                return ChatColor.RED + "You already have the maximum level of this enchantment!";
+                                return Translator.get("Commands.MaxLevelReached", ChatColor.RED + "You already have the maximum level of this enchantment!");
                             }
                             if (newLevel > maxLevel) {
                                 newLevel = maxLevel;
@@ -177,8 +183,9 @@ public class EnchantSubCommand implements SubCommand {
                             im.setLore(lore);
                             item.setItemMeta(im);
                             p.setItemInHand(item);
-                            return ChatColor.GREEN + "You have increased your item's level of " + custom.getDisplayName() + ChatColor.GREEN
-                                    + (newLevel == maxLevel ? " to " + maxLevel : " by " + level) + "!";
+                            String increaseType = (newLevel == maxLevel ? "to " + maxLevel : "by " + level);
+                            return Translator.get("Commands.EnchantLevelIncreased", ChatColor.GREEN + "You have increased your item's level of %enchant% %type%!")
+                                    .replace("%enchant%", custom.getDisplayName()).replace("%type%", increaseType);
                         }
                     }
                 }
@@ -188,7 +195,7 @@ public class EnchantSubCommand implements SubCommand {
                         if (EnchantManager.containsEnchantment(s)) {
                             number--;
                             if (number <= 0) {
-                                return ChatColor.RED + "You already have the maximum number of Enchantments on your item!";
+                                return Translator.get("Commands.MaxEnchantsReached", ChatColor.RED + "You already have the maximum number of Enchantments on your item!");
                             }
                         }
                     }
@@ -198,7 +205,8 @@ public class EnchantSubCommand implements SubCommand {
 
         if (custom instanceof CEnchantment) {
             p.setItemInHand(EnchantManager.addEnchant(item, (CEnchantment) custom, level));
-            return ChatColor.GREEN + "You have enchanted your item with '" + custom.getDisplayName() + ChatColor.GREEN + "' level " + level + "!";
+            return Translator.get("Commands.EnchantedItem", ChatColor.GREEN + "You have enchanted your item with %enchant% level %level%!")
+                    .replace("%enchant%", custom.getDisplayName()).replace("%level%", String.valueOf(level));
         } else if (custom instanceof CItem) {
             ItemStack newItem = new ItemStack(((CItem) custom).getMaterial());
             ItemMeta newIm = newItem.getItemMeta();
@@ -214,7 +222,7 @@ public class EnchantSubCommand implements SubCommand {
                 }
 
                 if (count < 4) {
-                    return ChatColor.RED + "Your inventory is full.";
+                    return Translator.get("Menu.Messages.NoSpace", ChatColor.RED + "You do not have enough space in your inventory!");
                 }
 
                 ItemStack cp = newItem.clone();
@@ -239,14 +247,15 @@ public class EnchantSubCommand implements SubCommand {
                 p.getInventory().addItem(bo);
             } else {
                 if (p.getInventory().firstEmpty() == -1) {
-                    return ChatColor.RED + "Your inventory is full!";
+                    return Translator.get("Menu.Messages.NoSpace", ChatColor.RED + "You do not have enough space in your inventory!");
                 } else {
                     p.getInventory().addItem(newItem);
                 }
             }
 
-            return ChatColor.GREEN + "You have created the item '" + custom.getDisplayName() + ChatColor.GREEN + "'!";
+            return Translator.get("Commands.CreatedItem", ChatColor.GREEN + "You have created the item %item%!")
+                    .replace("%item%", custom.getDisplayName());
         }
-        return ChatColor.RED + "No actions were taken.";
+        return Translator.get("Commands.NoActionsTaken", ChatColor.RED + "No actions were taken.");
     }
 }

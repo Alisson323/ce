@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 import com.taiter.ce.Main;
+import com.taiter.ce.utils.Translator;
 
 public class UpdateSubCommand implements SubCommand {
     private final Main main;
@@ -17,9 +18,9 @@ public class UpdateSubCommand implements SubCommand {
     @SuppressWarnings("deprecation")
     @Override
     public String execute(final CommandSender sender, String[] args) {
-        String usageError = ChatColor.RED + "Correct Usage: /ce update <check/applyupdate>";
+        String usageError = Translator.get("Commands.UpdateUsage", ChatColor.RED + "Correct Usage: /ce update <check/applyupdate>");
         if (!sender.equals(Bukkit.getConsoleSender())) {
-            return ChatColor.RED + "This command can only be run via Console";
+            return Translator.get("Commands.OnlyConsole", ChatColor.RED + "This command can only be run via Console");
         }
 
         if (args.length >= 2) {
@@ -35,12 +36,12 @@ public class UpdateSubCommand implements SubCommand {
                 return "";
             } else if (toDo.equals("applyupdate")) {
                 if (!main.hasChecked) {
-                    return ChatColor.RED + "You need to check for an update first using '/ce update check'.";
+                    return Translator.get("Commands.UpdateCheckFirst", ChatColor.RED + "You need to check for an update first using '/ce update check'.");
                 }
                 if (main.hasUpdate) {
                     if (!confirmUpdate) {
                         confirmUpdate = true;
-                        sender.sendMessage(ChatColor.AQUA + "Rerun the command to confirm the update (This expires in 5 Minutes).");
+                        sender.sendMessage(Translator.get("Commands.UpdateConfirm", ChatColor.AQUA + "Rerun the command to confirm the update (This expires in 5 Minutes)."));
                         Main.plugin.getServer().getScheduler().scheduleAsyncDelayedTask(Main.plugin, new BukkitRunnable() {
                             @Override
                             public void run() {
@@ -60,7 +61,7 @@ public class UpdateSubCommand implements SubCommand {
                         return "";
                     }
                 } else {
-                    return ChatColor.RED + "You are already using the latest version of CE.";
+                    return Translator.get("Commands.UpdateAlreadyLatest", ChatColor.RED + "You are already using the latest version of CE.");
                 }
             } else {
                 return usageError;

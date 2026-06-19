@@ -13,16 +13,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import com.taiter.ce.Main;
 import com.taiter.ce.utils.Tools;
+import com.taiter.ce.utils.Translator;
 import com.taiter.ce.CItems.CItem;
 import com.taiter.ce.CItems.utilities.Swimsuit;
 import com.taiter.ce.Enchantments.CEnchantment;
 import com.taiter.ce.Enchantments.EnchantManager;
 
 public class GiveSubCommand implements SubCommand {
-    private final Main main;
 
     public GiveSubCommand(Main main) {
-        this.main = main;
     }
 
     @SuppressWarnings("deprecation")
@@ -31,10 +30,10 @@ public class GiveSubCommand implements SubCommand {
         String node = "ce.cmd.*";
         String requiredPermission = "ce.cmd.give";
         if (!sender.hasPermission(node) && !sender.hasPermission(requiredPermission) && !sender.isOp()) {
-            return ChatColor.RED + "You do not have permission to use this command.";
+            return Translator.get("Commands.NoPermission", ChatColor.RED + "You do not have permission to execute this command.");
         }
 
-        String usageError = ChatColor.RED + "Correct Usage: /ce give <Player> <Material> <Enchantment:Level/Item> [Enchantment:Level] ...";
+        String usageError = Translator.get("Commands.GiveUsage", ChatColor.RED + "Correct Usage: /ce give <Player> <Material> <Enchantment:Level/Item> [Enchantment:Level] ...");
         if (args.length < 4) {
             return usageError;
         }
@@ -47,11 +46,11 @@ public class GiveSubCommand implements SubCommand {
         }
 
         if (target == null) {
-            return ChatColor.RED + "The Player '" + args[1] + "' was not found.";
+            return Translator.get("Commands.PlayerNotFound", ChatColor.RED + "The specified Player could not be found.");
         }
 
         if (target.getInventory().firstEmpty() < 0) {
-            return ChatColor.RED + "The Inventory of Player '" + args[1] + "' is full.";
+            return Translator.get("Commands.PlayerInventoryFull", ChatColor.RED + "The Inventory of Player '%player%' is full.").replace("%player%", args[1]);
         }
 
         Material mat = null;
@@ -204,7 +203,7 @@ public class GiveSubCommand implements SubCommand {
                     }
 
                     if (count < 4) {
-                        return ChatColor.RED + "The Inventory of Player '" + args[1] + "' is full.";
+                        return Translator.get("Commands.PlayerInventoryFull", ChatColor.RED + "The Inventory of Player '%player%' is full.").replace("%player%", args[1]);
                     }
 
                     ItemStack cp = newItem.clone();
@@ -228,10 +227,10 @@ public class GiveSubCommand implements SubCommand {
                     target.getInventory().addItem(le);
                     target.getInventory().addItem(bo);
                 }
-                successMsg += "The enchanted Item was given to Player " + target.getName() + ".";
-                targetNotification += "You have received an enchanted item from " + sender.getName() + "!";
+                successMsg += ChatColor.stripColor(Translator.get("Commands.GiveSuccess", "The enchanted Item was given to Player %player%.")).replace("%player%", target.getName()) + " ";
+                targetNotification += Translator.get("Commands.ReceiveNotification", ChatColor.GOLD + "You have received an enchanted item from %sender%!").replace("%sender%", sender.getName());
             } else {
-                return ChatColor.RED + target.getName() + " does not have the permission to use the item " + custom.getOriginalName() + ".";
+                return Translator.get("Commands.NoPermissionTarget", ChatColor.RED + "%player% does not have the permission to use the item %item%.").replace("%player%", target.getName()).replace("%item%", custom.getOriginalName());
             }
         }
 
@@ -247,8 +246,8 @@ public class GiveSubCommand implements SubCommand {
                 newItem.addUnsafeEnchantment(ench, level);
             }
             if (successMsg.length() < 10) {
-                successMsg += "The enchanted Item was successfully given to Player " + target.getName() + ".";
-                targetNotification += "You have received an enchanted item from " + sender.getName() + "!";
+                successMsg += ChatColor.stripColor(Translator.get("Commands.GiveSuccess", "The enchanted Item was given to Player %player%.")).replace("%player%", target.getName()) + " ";
+                targetNotification += Translator.get("Commands.ReceiveNotification", ChatColor.GOLD + "You have received an enchanted item from %sender%!").replace("%sender%", sender.getName());
             }
         }
 
@@ -265,8 +264,8 @@ public class GiveSubCommand implements SubCommand {
                 newItem = EnchantManager.addEnchantments(newItem, list);
             }
             if (successMsg.length() < 10) {
-                successMsg += "The enchanted Item was successfully given to Player " + target.getName() + ".";
-                targetNotification += "You have received an enchanted item from " + sender.getName() + "!";
+                successMsg += ChatColor.stripColor(Translator.get("Commands.GiveSuccess", "The enchanted Item was given to Player %player%.")).replace("%player%", target.getName()) + " ";
+                targetNotification += Translator.get("Commands.ReceiveNotification", ChatColor.GOLD + "You have received an enchanted item from %sender%!").replace("%sender%", sender.getName());
             }
         }
 
@@ -275,7 +274,7 @@ public class GiveSubCommand implements SubCommand {
             target.sendMessage(targetNotification);
             return ChatColor.GREEN + successMsg;
         } else {
-            return ChatColor.RED + "No enchantments or items were found to be applied.";
+            return Translator.get("Commands.NoActionsTaken", ChatColor.RED + "No actions were taken.");
         }
     }
 }

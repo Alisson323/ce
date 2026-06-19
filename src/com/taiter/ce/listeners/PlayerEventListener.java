@@ -18,12 +18,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import net.milkbowl.vault.economy.EconomyResponse;
-import com.taiter.ce.listeners.CEventHandler;
 import com.taiter.ce.Main;
 import com.taiter.ce.utils.Tools;
+import com.taiter.ce.utils.Translator;
 import com.taiter.ce.Enchantments.CEnchantment;
 import com.taiter.ce.Enchantments.EnchantManager;
-import com.taiter.ce.CItems.CItem;
 
 public class PlayerEventListener implements Listener {
 
@@ -57,8 +56,9 @@ public class PlayerEventListener implements Listener {
                         }
                         e.setCancelled(true);
                         p.setItemInHand(new ItemStack(Material.AIR));
-                        Inventory einv = Bukkit.createInventory(p, org.bukkit.event.inventory.InventoryType.FURNACE, ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE
-                                + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba");
+                        String title = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE
+                                + Translator.get("Runecrafting.Title", " Runecrafting ") + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
+                        Inventory einv = Bukkit.createInventory(p, org.bukkit.event.inventory.InventoryType.FURNACE, title);
                         einv.setContents(new ItemStack[]{new ItemStack(Material.AIR), i, new ItemStack(Material.AIR)});
                         p.openInventory(einv);
                         return;
@@ -99,7 +99,7 @@ public class PlayerEventListener implements Listener {
 
                         ItemStack inHand = p.getItemInHand();
                         if (!Tools.isApplicable(inHand, ce)) {
-                            p.sendMessage(ChatColor.RED + "This enchantment can not be applied to this item.");
+                            p.sendMessage(Translator.get("Commands.CannotEnchantItem", ChatColor.RED + "This enchantment cannot be applied to this item."));
                             return;
                         }
 
@@ -117,7 +117,7 @@ public class PlayerEventListener implements Listener {
                             lore = inHand.getItemMeta().getLore();
 
                             if (EnchantManager.getEnchantments(lore).size() == EnchantManager.getMaxEnchants()) {
-                                p.sendMessage(ChatColor.RED + "You already have the maximum amount of enchantments!");
+                                p.sendMessage(Translator.get("Commands.MaxEnchantsReached", ChatColor.RED + "You already have the maximum number of Enchantments on your item!"));
                                 return;
                             }
 
@@ -128,15 +128,17 @@ public class PlayerEventListener implements Listener {
                                         if (Main.econ.getBalance(p.getName()) >= cost) {
                                             EconomyResponse ecr = Main.econ.withdrawPlayer(p.getName(), cost);
                                             if (ecr.transactionSuccess()) {
-                                                p.sendMessage(ChatColor.GREEN + "Upgraded enchantment " + ce.getDisplayName() + ChatColor.GREEN + " for " + ChatColor.WHITE + cost + " "
-                                                        + ((cost == 1) ? Main.econ.currencyNameSingular() : Main.econ.currencyNamePlural()) + ChatColor.GREEN + ".");
+                                                String currency = ((cost == 1) ? Main.econ.currencyNameSingular() : Main.econ.currencyNamePlural());
+                                                p.sendMessage(Translator.get("Commands.UpgradedEnchant", ChatColor.GREEN + "Upgraded enchantment %enchant% for %cost%")
+                                                        .replace("%enchant%", ce.getDisplayName())
+                                                        .replace("%cost%", cost + " " + currency));
                                             } else {
                                                 p.sendMessage(ChatColor.RED + "An economy error has occured:");
                                                 p.sendMessage(ChatColor.RED + ecr.errorMessage);
                                                 return;
                                             }
                                         } else {
-                                            p.sendMessage(ChatColor.RED + "You do not have enough money to buy this!");
+                                            p.sendMessage(Translator.get("Menu.Messages.NoMoney", ChatColor.RED + "You do not have enough money to buy this!"));
                                             return;
                                         }
                                         lore.set(i, ce.getDisplayName() + " " + EnchantManager.intToLevel(newLevel));
@@ -144,7 +146,7 @@ public class PlayerEventListener implements Listener {
                                         inHand.setItemMeta(im);
                                         return;
                                     } else {
-                                        p.sendMessage(ChatColor.RED + "You already have the maximum level of this enchantment!");
+                                        p.sendMessage(Translator.get("Commands.MaxLevelReached", ChatColor.RED + "You already have the maximum level of this enchantment!"));
                                         return;
                                     }
                                 }
@@ -154,15 +156,17 @@ public class PlayerEventListener implements Listener {
                         if (Main.econ.getBalance(p.getName()) >= cost) {
                             EconomyResponse ecr = Main.econ.withdrawPlayer(p.getName(), cost);
                             if (ecr.transactionSuccess()) {
-                                p.sendMessage(ChatColor.GREEN + "Bought enchantment " + ce.getDisplayName() + ChatColor.GREEN + " for " + ChatColor.WHITE + cost + " "
-                                        + ((cost == 1) ? Main.econ.currencyNameSingular() : Main.econ.currencyNamePlural()) + ChatColor.GREEN + ".");
+                                String currency = ((cost == 1) ? Main.econ.currencyNameSingular() : Main.econ.currencyNamePlural());
+                                p.sendMessage(Translator.get("Commands.BoughtEnchant", ChatColor.GREEN + "Bought enchantment %enchant% for %cost%")
+                                        .replace("%enchant%", ce.getDisplayName())
+                                        .replace("%cost%", cost + " " + currency));
                             } else {
                                 Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "An economy error has occured:");
                                 Bukkit.getConsoleSender().sendMessage(ChatColor.RED + ecr.errorMessage);
                                 return;
                             }
                         } else {
-                            p.sendMessage(ChatColor.RED + "You do not have enough money to buy this!");
+                            p.sendMessage(Translator.get("Menu.Messages.NoMoney", ChatColor.RED + "You do not have enough money to buy this!"));
                             return;
                         }
 
@@ -174,7 +178,7 @@ public class PlayerEventListener implements Listener {
                         }
                         return;
                     } else {
-                        p.sendMessage(ChatColor.RED + "You do not have an item in your hand.");
+                        p.sendMessage(Translator.get("Commands.NoItemHand", ChatColor.RED + "You do not have an item in your hand."));
                         return;
                     }
                 }

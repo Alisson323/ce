@@ -49,13 +49,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import net.milkbowl.vault.economy.Economy;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.taiter.ce.CItems.*;
 import com.taiter.ce.Enchantments.CEnchantment;
 import com.taiter.ce.Enchantments.CEnchantment.Application;
 import com.taiter.ce.Enchantments.EnchantManager;
 import com.taiter.ce.Enchantments.Global.IceAspect;
 import com.taiter.ce.commands.CeCommand;
 import com.taiter.ce.listeners.*;
+import com.taiter.ce.utils.Translator;
 
 public final class Main extends JavaPlugin {
 
@@ -101,6 +101,8 @@ public final class Main extends JavaPlugin {
         config = this.getConfig();
         config.options().copyDefaults(true);
         this.saveConfig();
+        Translator.init(this);
+        Tools.prefix = Translator.get("Menu.Prefix", "CE - ");
         if (config.contains("enchantments"))
             Tools.convertOldConfig();
 
@@ -135,7 +137,7 @@ public final class Main extends JavaPlugin {
             return;
 
         try {
-            writePermissions();
+            com.taiter.ce.utils.PermissionHelper.writePermissions();
         } catch (IllegalArgumentException ex) {
             ex.printStackTrace();
         }
@@ -213,57 +215,7 @@ public final class Main extends JavaPlugin {
         return color;
     }
 
-    private void writePermissions() {
-        Permission mainNode = new Permission("ce.*", "The main permission node for Custom Enchantments.", PermissionDefault.OP);
-        Permission runecrafting = new Permission("ce.runecrafting", "The permission for Runecrafting.", PermissionDefault.OP);
-        runecrafting.addParent(mainNode, true);
 
-        Permission cmdNode = new Permission("ce.cmd.*", "The permission node for CE's commands.", PermissionDefault.OP);
-        Permission enchNode = new Permission("ce.ench.*", "The permission node for CE's EnchantManager.getEnchantments().", PermissionDefault.OP);
-        Permission itemNode = new Permission("ce.item.*", "The permission node for CE's  items.", PermissionDefault.OP);
-
-        cmdNode.addParent(mainNode, true);
-        enchNode.addParent(mainNode, true);
-        itemNode.addParent(mainNode, true);
-
-        Permission cmdMenu = new Permission("ce.cmd.menu", "The permission for the CE command 'menu'");
-        Permission cmdList = new Permission("ce.cmd.reload", "The permission for the CE command 'reload'");
-        Permission cmdGive = new Permission("ce.cmd.give", "The permission for the CE command 'give'");
-        Permission cmdChange = new Permission("ce.cmd.change", "The permission for the CE command 'change'");
-        Permission cmdEnchant = new Permission("ce.cmd.enchant", "The permission for the CE command 'enchant'");
-        Permission cmdRunecraft = new Permission("ce.cmd.runecrafting", "The permission for the CE command 'runecrafting'");
-
-        cmdMenu.addParent(cmdNode, true);
-        cmdList.addParent(cmdNode, true);
-        cmdGive.addParent(cmdNode, true);
-        cmdChange.addParent(cmdNode, true);
-        cmdEnchant.addParent(cmdNode, true);
-        cmdRunecraft.addParent(cmdNode, true);
-
-        Bukkit.getServer().getPluginManager().addPermission(mainNode);
-        Bukkit.getServer().getPluginManager().addPermission(runecrafting);
-        Bukkit.getServer().getPluginManager().addPermission(cmdNode);
-        Bukkit.getServer().getPluginManager().addPermission(enchNode);
-        Bukkit.getServer().getPluginManager().addPermission(itemNode);
-        Bukkit.getServer().getPluginManager().addPermission(cmdMenu);
-        Bukkit.getServer().getPluginManager().addPermission(cmdList);
-        Bukkit.getServer().getPluginManager().addPermission(cmdGive);
-        Bukkit.getServer().getPluginManager().addPermission(cmdChange);
-        Bukkit.getServer().getPluginManager().addPermission(cmdEnchant);
-        Bukkit.getServer().getPluginManager().addPermission(cmdRunecraft);
-
-        for (CItem ci : items) {
-            Permission itemTemp = new Permission("ce.item." + ci.getPermissionName(), "The permission for the CE Item '" + ci.getOriginalName() + "'.");
-            itemTemp.addParent(itemNode, true);
-            Bukkit.getServer().getPluginManager().addPermission(itemTemp);
-        }
-
-        for (CEnchantment ce : EnchantManager.getEnchantments()) {
-            Permission enchTemp = new Permission("ce.ench." + ce.getPermissionName(), "The permission for the CE Enchantment '" + ce.getOriginalName() + "'.");
-            enchTemp.addParent(enchNode, true);
-            Bukkit.getServer().getPluginManager().addPermission(enchTemp);
-        }
-    }
 
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null)
@@ -389,7 +341,7 @@ public final class Main extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("ce") || cmd.getName().equalsIgnoreCase("customenchantments")) {
+        if (cmd.getName().equalsIgnoreCase("customenchantments") || cmd.getName().equalsIgnoreCase("ce") || label.equalsIgnoreCase("encantamentos") || label.equalsIgnoreCase("encantos") || label.equalsIgnoreCase("ec")) {
             String result = commandC.processCommand(sender, args);
             if (!result.equals(""))
                 sender.sendMessage(result);

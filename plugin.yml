@@ -7,4 +7,4 @@ softdepend: [WorldGuard, WorldEdit, Vault]
 commands:
   customenchantments:
    description: The main command for Custom Enchantments
-   aliases: [ce]
+   aliases: [ce, encantamentos, encantamentoscustomizados, ec]

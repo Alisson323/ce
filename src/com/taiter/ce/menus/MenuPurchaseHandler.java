@@ -1,6 +1,7 @@
 package com.taiter.ce.menus;
 
 import com.taiter.ce.utils.Tools;
+import com.taiter.ce.utils.Translator;
 import com.taiter.ce.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,7 +18,7 @@ public class MenuPurchaseHandler {
     public static void handlePurchaseItem(Player p, ItemStack clickedItem) {
         CItem ci = Tools.getItemByDisplayname(clickedItem.getItemMeta().getDisplayName());
         if (!p.hasPermission("ce.item.*") && !p.hasPermission("ce.item." + ci.getPermissionName())) {
-            p.sendMessage(ChatColor.RED + "You do not have permission to buy this Item!");
+            p.sendMessage(Translator.get("Menu.Messages.NoPermissionBuy", ChatColor.RED + "You do not have permission to buy this Item!"));
             return;
         }
 
@@ -27,8 +28,11 @@ public class MenuPurchaseHandler {
                 if (Main.econ.getBalance(p.getName()) >= cost) {
                     EconomyResponse ecr = Main.econ.withdrawPlayer(p.getName(), cost);
                     if (ecr.transactionSuccess()) {
-                        p.sendMessage(ChatColor.GREEN + "Purchased " + clickedItem.getItemMeta().getDisplayName() + "" + ChatColor.GREEN + " for " + ChatColor.WHITE + cost + "  "
-                                + ((cost == 1) ? Main.econ.currencyNameSingular() : Main.econ.currencyNamePlural()) + ChatColor.GREEN + "!");
+                        String currency = (cost == 1) ? Main.econ.currencyNameSingular() : Main.econ.currencyNamePlural();
+                        p.sendMessage(Translator.get("Menu.Messages.Purchased", ChatColor.GREEN + "Purchased %item% " + ChatColor.GREEN + "for " + ChatColor.WHITE + "%cost% %currency%")
+                                .replace("%item%", clickedItem.getItemMeta().getDisplayName())
+                                .replace("%cost%", String.valueOf(cost))
+                                .replace("%currency%", currency));
                         ItemMeta im = clickedItem.getItemMeta();
                         im.setLore(ci.getDescription());
                         clickedItem.setItemMeta(im);
@@ -39,17 +43,17 @@ public class MenuPurchaseHandler {
                         return;
                     }
                 } else {
-                    p.sendMessage(ChatColor.RED + "You do not have enough money to buy this!");
+                    p.sendMessage(Translator.get("Menu.Messages.NoMoney", ChatColor.RED + "You do not have enough money to buy this!"));
                     return;
                 }
             } else {
-                p.sendMessage(ChatColor.GREEN + "Created " + clickedItem.getItemMeta().getDisplayName() + "" + ChatColor.GREEN + "!");
+                p.sendMessage(Translator.get("Menu.Messages.Created", ChatColor.GREEN + "Created %item%" + ChatColor.GREEN + "!").replace("%item%", clickedItem.getItemMeta().getDisplayName()));
             }
 
             p.getInventory().addItem(clickedItem);
             p.closeInventory();
         } else {
-            p.sendMessage(ChatColor.RED + "You do not have enough space in your inventory!");
+            p.sendMessage(Translator.get("Menu.Messages.NoSpace", ChatColor.RED + "You do not have enough space in your inventory!"));
         }
     }
 
@@ -64,8 +68,11 @@ public class MenuPurchaseHandler {
                 if (Main.econ.getBalance(p.getName()) >= cost) {
                     EconomyResponse ecr = Main.econ.withdrawPlayer(p.getName(), cost);
                     if (ecr.transactionSuccess()) {
-                        p.sendMessage(ChatColor.GREEN + "Purchased " + clickedItem.getItemMeta().getDisplayName() + "" + ChatColor.GREEN + " for " + ChatColor.WHITE + cost + " "
-                                + ((cost == 1) ? Main.econ.currencyNameSingular() : Main.econ.currencyNamePlural()) + ChatColor.GREEN + "!");
+                        String currency = (cost == 1) ? Main.econ.currencyNameSingular() : Main.econ.currencyNamePlural();
+                        p.sendMessage(Translator.get("Menu.Messages.Purchased", ChatColor.GREEN + "Purchased %item% " + ChatColor.GREEN + "for " + ChatColor.WHITE + "%cost% %currency%")
+                                .replace("%item%", clickedItem.getItemMeta().getDisplayName())
+                                .replace("%cost%", String.valueOf(cost))
+                                .replace("%currency%", currency));
                     } else {
                         Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "An economy error has occured:");
                         Bukkit.getConsoleSender().sendMessage(ChatColor.RED + ecr.errorMessage);
@@ -73,17 +80,17 @@ public class MenuPurchaseHandler {
                         return;
                     }
                 } else {
-                    p.sendMessage(ChatColor.RED + "You do not have enough money to buy this!");
+                    p.sendMessage(Translator.get("Menu.Messages.NoMoney", ChatColor.RED + "You do not have enough money to buy this!"));
                     return;
                 }
             } else {
-                p.sendMessage(ChatColor.GREEN + "Created " + clickedItem.getItemMeta().getDisplayName() + "" + ChatColor.GREEN + "!");
+                p.sendMessage(Translator.get("Menu.Messages.Created", ChatColor.GREEN + "Created %item%" + ChatColor.GREEN + "!").replace("%item%", clickedItem.getItemMeta().getDisplayName()));
             }
 
             p.getInventory().addItem(EnchantManager.getEnchantBook(ce, level));
             p.closeInventory();
         } else {
-            p.sendMessage(ChatColor.RED + "You do not have enough space in your inventory!");
+            p.sendMessage(Translator.get("Menu.Messages.NoSpace", ChatColor.RED + "You do not have enough space in your inventory!"));
         }
     }
 }
