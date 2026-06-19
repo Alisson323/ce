@@ -1,4 +1,4 @@
-package com.taiter.ce.Enchantments;
+package com.taiter.ce.utils;
 
 public class LevelConverter {
 

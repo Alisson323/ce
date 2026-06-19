@@ -60,7 +60,6 @@ com\taiter\ce\hooks\Updater.class
 com\taiter\ce\Enchantments\Boots\Stomp.class
 com\taiter\ce\Enchantments\Armor\Endershift.class
 com\taiter\ce\Enchantments\Armor\Cursed.class
-com\taiter\ce\Enchantments\LevelConverter.class
 com\taiter\ce\Enchantments\Global\Shockwave$2.class
 com\taiter\ce\utils\LocationHelper.class
 com\taiter\ce\CItems\boots\HermesBoots.class
@@ -142,6 +141,7 @@ com\taiter\ce\Main$1.class
 com\taiter\ce\CItems\traps\PiranhaTrap$1.class
 com\taiter\ce\database\DatabaseManager.class
 com\taiter\ce\Enchantments\EnchantManager.class
+com\taiter\ce\utils\LevelConverter.class
 com\taiter\ce\CItems\boots\LivefireBoots.class
 com\taiter\ce\CItems\traps\PricklyBlock.class
 com\taiter\ce\listeners\EntityEventListener.class

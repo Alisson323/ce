@@ -36,20 +36,27 @@ public class ReflectionHelper {
     private static Constructor<?> effectPacketConstructor;
 
     static {
-        String pkg = Bukkit.getServer().getClass().getPackage().getName();
-        String version = pkg.substring(pkg.lastIndexOf(".") + 1);
-        cbVersion += version + ".";
-        nmsVersion += version + ".";
-
-        //Grab all needed reflection methods/constructors
         try {
-            effectPacketConstructor = getNMSClass("PacketPlayOutWorldParticles").getConstructor(getNMSClass("EnumParticle"), boolean.class, float.class, float.class, float.class, float.class,
-                    float.class, float.class, float.class, int.class, int[].class);
-        } catch (NoSuchMethodException | SecurityException e) {
-            e.printStackTrace();
+            String pkg = Bukkit.getServer().getClass().getPackage().getName();
+            String version = pkg.substring(pkg.lastIndexOf(".") + 1);
+            cbVersion += version + ".";
+            nmsVersion += version + ".";
+        } catch (Throwable e) {}
+
+        try {
+            Class<?> packetClass = getNMSClass("PacketPlayOutWorldParticles");
+            Class<?> enumParticle = getNMSClass("EnumParticle");
+            if (packetClass != null && enumParticle != null) {
+                effectPacketConstructor = packetClass.getConstructor(enumParticle, boolean.class, float.class, float.class, float.class, float.class,
+                        float.class, float.class, float.class, int.class, int[].class);
+            }
+        } catch (Throwable e) {
         }
 
-        new EffectManager();
+        try {
+            new EffectManager();
+        } catch (Throwable e) {
+        }
     }
 
     public static Constructor<?> getEffectPacketConstructor() {

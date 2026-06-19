@@ -35,15 +35,31 @@ public class Shielded extends CEnchantment {
     int strengthPerLevel;
     long cooldown;
 
+    private static Method bukkitGetAbsorption;
+    private static Method bukkitSetAbsorption;
     private static Method getAbsorptionHearts;
     private static Method setAbsorptionHearts;
 
     static {
         try {
-            getAbsorptionHearts = ReflectionHelper.getNMSClass("EntityHuman").getDeclaredMethod("getAbsorptionHearts", new Class[0]);
-            setAbsorptionHearts = ReflectionHelper.getNMSClass("EntityHuman").getDeclaredMethod("setAbsorptionHearts", float.class);
-        } catch (NoSuchMethodException | SecurityException e) {
-            e.printStackTrace();
+            bukkitGetAbsorption = Player.class.getMethod("getAbsorptionAmount");
+            bukkitSetAbsorption = Player.class.getMethod("setAbsorptionAmount", double.class);
+        } catch (Throwable t) {
+            try {
+                bukkitGetAbsorption = Player.class.getMethod("getAbsorptionAmount");
+                bukkitSetAbsorption = Player.class.getMethod("setAbsorptionAmount", float.class);
+            } catch (Throwable t2) {
+            }
+        }
+        if (bukkitGetAbsorption == null) {
+            try {
+                Class<?> entityHuman = ReflectionHelper.getNMSClass("EntityHuman");
+                if (entityHuman != null) {
+                    getAbsorptionHearts = entityHuman.getDeclaredMethod("getAbsorptionHearts");
+                    setAbsorptionHearts = entityHuman.getDeclaredMethod("setAbsorptionHearts", float.class);
+                }
+            } catch (Throwable t) {
+            }
         }
     }
 
@@ -73,19 +89,43 @@ public class Shielded extends CEnchantment {
     }
 
     private float getAbsorptionHearts(Player player) {
-        try {
-            return (float) getAbsorptionHearts.invoke(ReflectionHelper.getEntityHandle(player), new Object[0]);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
+        if (bukkitGetAbsorption != null) {
+            try {
+                Number val = (Number) bukkitGetAbsorption.invoke(player);
+                return val.floatValue();
+            } catch (Throwable t) {
+            }
+        }
+        if (getAbsorptionHearts != null) {
+            try {
+                Number val = (Number) getAbsorptionHearts.invoke(ReflectionHelper.getEntityHandle(player));
+                return val.floatValue();
+            } catch (Throwable t) {
+            }
         }
         return 0;
     }
 
     private void setAbsorptionHearts(Player player, float newValue) {
-        try {
-            setAbsorptionHearts.invoke(ReflectionHelper.getEntityHandle(player), newValue);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
+        if (bukkitSetAbsorption != null) {
+            try {
+                Class<?>[] paramTypes = bukkitSetAbsorption.getParameterTypes();
+                if (paramTypes.length > 0) {
+                    if (paramTypes[0] == double.class) {
+                        bukkitSetAbsorption.invoke(player, (double) newValue);
+                    } else {
+                        bukkitSetAbsorption.invoke(player, newValue);
+                    }
+                }
+                return;
+            } catch (Throwable t) {
+            }
+        }
+        if (setAbsorptionHearts != null) {
+            try {
+                setAbsorptionHearts.invoke(ReflectionHelper.getEntityHandle(player), newValue);
+            } catch (Throwable t) {
+            }
         }
     }
 

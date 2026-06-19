@@ -25,14 +25,13 @@ public class InventoryMenuListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void inventoryMenuPrevention(InventoryDragEvent event) {
-        String title = event.getView().getTopInventory().getTitle();
+        String title = event.getView().getTitle();
         if (title.startsWith("CE") || title.startsWith(Tools.prefix)) {
             event.setCancelled(true);
         } else if (useRuneCrafting) {
-            String invName = event.getView().getTopInventory().getName();
-            String expected = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + Translator.get("Runecrafting.Title", " Runecrafting ") + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
-            String fallback = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
-            if (invName.equals(expected) || invName.equals(fallback)) {
+            String titleClean = ChatColor.stripColor(title).replace(" ", "").toLowerCase();
+            String expectedClean = ChatColor.stripColor(Translator.get("Runecrafting.Title", "Runecrafting")).replace(" ", "").toLowerCase();
+            if (titleClean.contains("runecrafting") || titleClean.contains(expectedClean)) {
                 RunecraftingHandler.updateRunecraftingInventory(event.getInventory());
             }
         }
@@ -40,7 +39,7 @@ public class InventoryMenuListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void inventoryMenuPrevention(InventoryCreativeEvent event) {
-        String title = event.getView().getTopInventory().getTitle();
+        String title = event.getView().getTitle();
         if (title.startsWith("CE") || title.startsWith(Tools.prefix)) {
             event.setCancelled(true);
         }
@@ -48,10 +47,10 @@ public class InventoryMenuListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void inventoryClose(InventoryCloseEvent event) {
-        String invName = event.getInventory().getName();
-        String expected = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + Translator.get("Runecrafting.Title", " Runecrafting ") + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
-        String fallback = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
-        if (invName.equals(expected) || invName.equals(fallback)) {
+        String title = event.getView().getTitle();
+        String titleClean = ChatColor.stripColor(title).replace(" ", "").toLowerCase();
+        String expectedClean = ChatColor.stripColor(Translator.get("Runecrafting.Title", "Runecrafting")).replace(" ", "").toLowerCase();
+        if (titleClean.contains("runecrafting") || titleClean.contains(expectedClean)) {
             ItemStack[] contents = event.getInventory().getContents();
             HumanEntity p = event.getPlayer();
             org.bukkit.Location loc = p.getLocation().add(0, 1.25, 0);
@@ -79,11 +78,12 @@ public class InventoryMenuListener implements Listener {
             return;
         }
 
+        String title = event.getView().getTitle();
+
         if (useRuneCrafting) {
-            String invName = event.getView().getTopInventory().getName();
-            String expected = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + Translator.get("Runecrafting.Title", " Runecrafting ") + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
-            String fallback = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
-            if (invName.equals(expected) || invName.equals(fallback)) {
+            String titleClean = ChatColor.stripColor(title).replace(" ", "").toLowerCase();
+            String expectedClean = ChatColor.stripColor(Translator.get("Runecrafting.Title", "Runecrafting")).replace(" ", "").toLowerCase();
+            if (titleClean.contains("runecrafting") || titleClean.contains(expectedClean)) {
                 RunecraftingHandler.handleRunecrafting(event);
                 return;
             }
@@ -133,7 +133,6 @@ public class InventoryMenuListener implements Listener {
             return;
         }
 
-        String title = event.getView().getTopInventory().getTitle();
         if (title.startsWith("CE") || title.startsWith(Tools.prefix)) {
             Inventory topInv = event.getView().getTopInventory();
             final Player p = (Player) event.getWhoClicked();
@@ -143,20 +142,20 @@ public class InventoryMenuListener implements Listener {
 
             if (event.getRawSlot() == topInv.getSize() - 1) {
                 p.closeInventory();
-                p.openInventory(Tools.getPreviousInventory(topInv.getTitle()));
+                p.openInventory(Tools.getPreviousInventory(title));
                 return;
             }
 
             if (event.getRawSlot() < topInv.getSize()) {
-                if (topInv.getTitle().equals(Tools.prefix + "Enchantments")
-                        || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Enchantments", "Enchantments"))) {
+                if (title.equals(Tools.prefix + "Enchantments")
+                        || title.equals(Tools.prefix + Translator.get("Menu.Title.Enchantments", "Enchantments"))) {
                     p.closeInventory();
                     p.openInventory(Tools.getEnchantmentMenu(p, clickedItem.getItemMeta().getDisplayName()));
                     return;
                 }
 
-                if (topInv.getTitle().equals(Tools.prefix + "Main Menu")
-                        || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.MainMenu", "Main Menu"))) {
+                if (title.equals(Tools.prefix + "Main Menu")
+                        || title.equals(Tools.prefix + Translator.get("Menu.Title.MainMenu", "Main Menu"))) {
                     if (event.getRawSlot() == 4) {
                         p.closeInventory();
                         p.openInventory(Tools.getItemMenu(p));
@@ -173,12 +172,12 @@ public class InventoryMenuListener implements Listener {
                     }
                 }
 
-                if (topInv.getTitle().equals(Tools.prefix + "Global") || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Global", "Global"))
-                        || topInv.getTitle().equals(Tools.prefix + "Bow") || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Bow", "Bow"))
-                        || topInv.getTitle().equals(Tools.prefix + "Armor") || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Armor", "Armor"))
-                        || topInv.getTitle().equals(Tools.prefix + "Helmet") || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Helmet", "Helmet"))
-                        || topInv.getTitle().equals(Tools.prefix + "Boots") || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Boots", "Boots"))
-                        || topInv.getTitle().equals(Tools.prefix + "Tool") || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Tool", "Tool"))) {
+                if (title.equals(Tools.prefix + "Global") || title.equals(Tools.prefix + Translator.get("Menu.Title.Global", "Global"))
+                        || title.equals(Tools.prefix + "Bow") || title.equals(Tools.prefix + Translator.get("Menu.Title.Bow", "Bow"))
+                        || title.equals(Tools.prefix + "Armor") || title.equals(Tools.prefix + Translator.get("Menu.Title.Armor", "Armor"))
+                        || title.equals(Tools.prefix + "Helmet") || title.equals(Tools.prefix + Translator.get("Menu.Title.Helmet", "Helmet"))
+                        || title.equals(Tools.prefix + "Boots") || title.equals(Tools.prefix + Translator.get("Menu.Title.Boots", "Boots"))
+                        || title.equals(Tools.prefix + "Tool") || title.equals(Tools.prefix + Translator.get("Menu.Title.Tool", "Tool"))) {
                     if (p.isOp() || Tools.checkPermission(EnchantManager.getEnchantment(clickedItem.getItemMeta().getDisplayName()), p)) {
                         MenuManager.openLevelSelectionMenu(p, clickedItem);
                         return;
@@ -188,14 +187,14 @@ public class InventoryMenuListener implements Listener {
                     }
                 }
 
-                if (topInv.getTitle().equals(Tools.prefix + "Items")
-                        || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.Items", "Items"))) {
+                if (title.equals(Tools.prefix + "Items")
+                        || title.equals(Tools.prefix + Translator.get("Menu.Title.Items", "Items"))) {
                     MenuPurchaseHandler.handlePurchaseItem(p, clickedItem);
                     return;
                 }
 
-                if (topInv.getTitle().equals(Tools.prefix + "Level selection")
-                        || topInv.getTitle().equals(Tools.prefix + Translator.get("Menu.Title.LevelSelection", "Level selection"))) {
+                if (title.equals(Tools.prefix + "Level selection")
+                        || title.equals(Tools.prefix + Translator.get("Menu.Title.LevelSelection", "Level selection"))) {
                     MenuPurchaseHandler.handlePurchaseLevelSelection(p, clickedItem);
                     return;
                 }

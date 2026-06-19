@@ -174,7 +174,14 @@ public class PlayerEventListener implements Listener {
                         im.setLore(lore);
                         inHand.setItemMeta(im);
                         if (!inHand.containsEnchantment(EnchantManager.getGlowEnchantment())) {
-                            inHand.addUnsafeEnchantment(EnchantManager.getGlowEnchantment(), 0);
+                            inHand.addUnsafeEnchantment(EnchantManager.getGlowEnchantment(), 1);
+                            ItemMeta meta = inHand.getItemMeta();
+                            if (meta != null) {
+                                try {
+                                    meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+                                } catch (Throwable t) {}
+                                inHand.setItemMeta(meta);
+                            }
                         }
                         return;
                     } else {

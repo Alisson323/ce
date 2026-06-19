@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.taiter.ce.Main;
+import com.taiter.ce.utils.LevelConverter;
 
 /*
 * This file is part of Custom Enchantments
@@ -48,40 +49,8 @@ public class EnchantManager {
         glowEnchantment = registerGlowEnchantment();
     }
 
-    @SuppressWarnings("deprecation")
     private static Enchantment registerGlowEnchantment() {
-        int id = Main.config.getInt("Global.Enchantments.GlowEnchantmentID");
-        Enchantment glow = Enchantment.getById(id);
-        if (glow != null)
-            if (glow.getName().equals("Custom Enchantment"))
-                return glow;
-            else
-                id = Enchantment.values()[Enchantment.values().length - 1].getId() + 1;
-
-        Boolean forced = false;
-        if (!Enchantment.isAcceptingRegistrations()) //Allow new enchantments to be registered again
-            try {
-                Field f = Enchantment.class.getDeclaredField("acceptingNew");
-                f.setAccessible(true);
-                f.set(null, true);
-                forced = true;
-            } catch (Exception ex) {
-            }
-
-        try {
-            glow = new GlowEnchantment(100);
-            Enchantment.registerEnchantment(glow);
-        } catch (Exception ex) {
-        }
-
-        if (forced) //Revert change
-            try {
-                Field f = Enchantment.class.getDeclaredField("acceptingNew");
-                f.set(null, false);
-                f.setAccessible(false);
-            } catch (Exception ex) {
-            }
-        return glow;
+        return Enchantment.DURABILITY;
     }
 
     public static ItemStack addEnchant(ItemStack item, CEnchantment ce) {
@@ -106,10 +75,13 @@ public class EnchantManager {
         }
         if (level > ce.getEnchantmentMaxLevel())
             level = ce.getEnchantmentMaxLevel();
-        lore.add(ce.getDisplayName() + " " + intToLevel(level));
+        lore.add(lorePrefix + ce.getDisplayName() + " " + intToLevel(level));
         im.setLore(lore);
+        try {
+            im.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+        } catch (Throwable t) {}
         item.setItemMeta(im);
-        item.addUnsafeEnchantment(glowEnchantment, 0);
+        item.addUnsafeEnchantment(glowEnchantment, 1);
         return item;
     }
 
@@ -133,11 +105,14 @@ public class EnchantManager {
             int level = list.get(ce);
             if (level > ce.getEnchantmentMaxLevel())
                 level = ce.getEnchantmentMaxLevel();
-            lore.add(ce.getDisplayName() + " " + intToLevel(level));
+            lore.add(lorePrefix + ce.getDisplayName() + " " + intToLevel(level));
         }
         im.setLore(lore);
+        try {
+            im.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+        } catch (Throwable t) {}
         item.setItemMeta(im);
-        item.addUnsafeEnchantment(glowEnchantment, 0);
+        item.addUnsafeEnchantment(glowEnchantment, 1);
         return item;
     }
 
@@ -160,8 +135,24 @@ public class EnchantManager {
                 lore.remove(s);
                 im.setLore(lore);
                 item.setItemMeta(im);
-                if (item.getEnchantments().containsKey(glowEnchantment))
-                    item.removeEnchantment(glowEnchantment);
+                boolean hasMoreCustom = false;
+                for (String line : lore) {
+                    if (containsEnchantment(line)) {
+                        hasMoreCustom = true;
+                        break;
+                    }
+                }
+                if (!hasMoreCustom) {
+                    if (item.getEnchantments().containsKey(glowEnchantment))
+                        item.removeEnchantment(glowEnchantment);
+                    ItemMeta meta = item.getItemMeta();
+                    if (meta != null) {
+                        try {
+                            meta.removeItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+                        } catch (Throwable t) {}
+                        item.setItemMeta(meta);
+                    }
+                }
                 return;
             }
     }
@@ -207,37 +198,47 @@ public class EnchantManager {
 
     public static Set<CEnchantment> getEnchantments(List<String> lore) {
         Set<CEnchantment> list = new LinkedHashSet<CEnchantment>();
-        if (lore != null)
-            for (String name : lore)
-                if (name.length() > 3)
+        if (lore != null) {
+            for (String line : lore) {
+                if (line.length() > 3) {
+                    String cleanLine = ChatColor.stripColor(line).toLowerCase();
                     for (CEnchantment ce : enchantments) {
                         String enchantment = ChatColor.stripColor(ce.getDisplayName()).toLowerCase();
-                        name = ChatColor.stripColor(name).toLowerCase();
-                        if (name.startsWith(enchantment) || name.startsWith(ce.getOriginalName().toLowerCase())) {
-                            String[] split = name.split(" ");
-                            name = name.substring(0, name.length() - 1 - split[split.length - 1].length());
-                            if (name.equals(enchantment) || name.equals(ce.getOriginalName()))
+                        String origName = ce.getOriginalName().toLowerCase();
+                        if (cleanLine.startsWith(enchantment) || cleanLine.startsWith(origName)) {
+                            String[] split = cleanLine.split(" ");
+                            String nameWithoutLevel = cleanLine.substring(0, cleanLine.length() - 1 - split[split.length - 1].length());
+                            if (nameWithoutLevel.equals(enchantment) || nameWithoutLevel.equals(ce.getOriginalName().toLowerCase())) {
                                 list.add(ce);
+                            }
                         }
                     }
+                }
+            }
+        }
         return list;
     }
 
     public static HashMap<CEnchantment, Integer> getEnchantmentLevels(List<String> lore) {
         HashMap<CEnchantment, Integer> list = new HashMap<CEnchantment, Integer>();
-        if (lore != null)
-            for (String name : lore)
-                if (name.length() > 3)
+        if (lore != null) {
+            for (String line : lore) {
+                if (line.length() > 3) {
+                    String cleanLine = ChatColor.stripColor(line).toLowerCase();
                     for (CEnchantment ce : enchantments) {
                         String enchantment = ChatColor.stripColor(ce.getDisplayName()).toLowerCase();
-                        name = ChatColor.stripColor(name).toLowerCase();
-                        if (name.startsWith(enchantment) || name.startsWith(ce.getOriginalName().toLowerCase())) {
-                            String[] split = name.split(" ");
-                            name = name.substring(0, name.length() - 1 - split[split.length - 1].length());
-                            if (name.equals(enchantment) || name.equals(ce.getOriginalName()))
+                        String origName = ce.getOriginalName().toLowerCase();
+                        if (cleanLine.startsWith(enchantment) || cleanLine.startsWith(origName)) {
+                            String[] split = cleanLine.split(" ");
+                            String nameWithoutLevel = cleanLine.substring(0, cleanLine.length() - 1 - split[split.length - 1].length());
+                            if (nameWithoutLevel.equals(enchantment) || nameWithoutLevel.equals(ce.getOriginalName().toLowerCase())) {
                                 list.put(ce, levelToInt(split[split.length - 1]));
+                            }
                         }
                     }
+                }
+            }
+        }
         return list;
     }
 
@@ -249,9 +250,16 @@ public class EnchantManager {
     }
 
     public static boolean isEnchantmentBook(ItemStack i) {
-        if (i != null && i.getType().equals(Material.ENCHANTED_BOOK))
-            if (i.hasItemMeta() && i.getItemMeta().hasDisplayName() && i.getItemMeta().getDisplayName().equals(enchantBookName))
-                return true;
+        if (i != null && i.getType().equals(Material.ENCHANTED_BOOK)) {
+            if (i.hasItemMeta()) {
+                if (i.getItemMeta().hasDisplayName() && i.getItemMeta().getDisplayName().equals(enchantBookName)) {
+                    return true;
+                }
+                if (hasEnchantments(i)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -339,9 +347,11 @@ public class EnchantManager {
         ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);
         ItemMeta im = item.getItemMeta();
         im.setLore(Arrays.asList(new String[] { lorePrefix + ce.getDisplayName() + " " + intToLevel(level) }));
-        im.setDisplayName(enchantBookName);
+        try {
+            im.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+        } catch (Throwable t) {}
         item.setItemMeta(im);
-        item.addUnsafeEnchantment(glowEnchantment, 0);
+        item.addUnsafeEnchantment(glowEnchantment, 1);
         return item;
     }
 
@@ -353,9 +363,11 @@ public class EnchantManager {
             lore.add(lorePrefix + ce.getDisplayName() + " " + intToLevel(list.get(ce)));
         }
         im.setLore(lore);
-        im.setDisplayName(enchantBookName);
+        try {
+            im.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+        } catch (Throwable t) {}
         item.setItemMeta(im);
-        item.addUnsafeEnchantment(glowEnchantment, 0);
+        item.addUnsafeEnchantment(glowEnchantment, 1);
         return item;
     }
 

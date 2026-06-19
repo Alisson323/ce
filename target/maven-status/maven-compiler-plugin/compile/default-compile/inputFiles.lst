@@ -54,6 +54,7 @@ C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\ta
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\Enchantments\Tool\Smelting.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\listeners\EntityEventListener.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\Enchantments\Armor\Molten.java
+C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\utils\LevelConverter.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\commands\ListSubCommand.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\Enchantments\Bow\Healing.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\Enchantments\Global\Disarming.java
@@ -75,7 +76,6 @@ C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\ta
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\CItems\boots\HermesBoots.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\CItems\bows\Minigun.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\Enchantments\Armor\Shielded.java
-C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\Enchantments\LevelConverter.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\hooks\WorldGuardHook.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\commands\ChangeSubCommand.java
 C:\Users\aliss\Documents\Estudo Programação JAVA\Aulas -\Sources\ce\src\com\taiter\ce\Enchantments\Bow\Blaze.java

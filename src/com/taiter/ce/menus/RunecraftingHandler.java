@@ -177,12 +177,19 @@ public class RunecraftingHandler {
                             public void run() {
                                 if (counter <= 0) {
                                     inv.setItem(2, new ItemStack(Material.AIR));
-                                    String expectedTitle = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + Translator.get("Runecrafting.Title", " Runecrafting ") + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
-                                    String expectedTitleFallback = ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "abc" + ChatColor.RESET + ChatColor.DARK_PURPLE + " Runecrafting " + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "cba";
-                                    if (p.getOpenInventory() != null && (p.getOpenInventory().getTitle().equals(expectedTitle) || p.getOpenInventory().getTitle().equals(expectedTitleFallback)))
-                                        p.setItemOnCursor(result);
-                                    else
-                                        p.getInventory().addItem(result);
+                                     boolean isStillOpen = false;
+                                     if (p.getOpenInventory() != null) {
+                                         String openTitle = ChatColor.stripColor(p.getOpenInventory().getTitle()).replace(" ", "").toLowerCase();
+                                         String expectedClean = ChatColor.stripColor(Translator.get("Runecrafting.Title", "Runecrafting")).replace(" ", "").toLowerCase();
+                                         if (openTitle.contains("runecrafting") || openTitle.contains(expectedClean)) {
+                                             isStillOpen = true;
+                                         }
+                                     }
+                                     if (isStillOpen) {
+                                         p.setItemOnCursor(result);
+                                     } else {
+                                         p.getInventory().addItem(result);
+                                     }
                                     this.cancel();
                                     return;
                                 }
@@ -254,8 +261,11 @@ public class RunecraftingHandler {
                 int levelCost = 0;
                 double moneyCost = 0;
 
-                if (disenchanting && top.getType().equals(XMaterial.BOOK.parseMaterial()) && !bot.getType().equals(XMaterial.ENCHANTED_BOOK.parseMaterial())) {
-                    HashMap<CEnchantment, Integer> enchs = EnchantManager.getEnchantmentLevels(bot.getItemMeta().getLore());
+                if (disenchanting && ((top.getType().equals(XMaterial.BOOK.parseMaterial()) && !bot.getType().equals(XMaterial.ENCHANTED_BOOK.parseMaterial())) ||
+                                      (bot.getType().equals(XMaterial.BOOK.parseMaterial()) && !top.getType().equals(XMaterial.ENCHANTED_BOOK.parseMaterial())))) {
+                    
+                    ItemStack enchantedItem = top.getType().equals(XMaterial.BOOK.parseMaterial()) ? bot : top;
+                    HashMap<CEnchantment, Integer> enchs = EnchantManager.getEnchantmentLevels(enchantedItem.getItemMeta().getLore());
 
                     for (CEnchantment ce : enchs.keySet()) {
                         int lvl = ce.getRunecraftCostLevel(enchs.get(ce));
@@ -282,67 +292,71 @@ public class RunecraftingHandler {
                     return;
                 }
 
-                if (top.getType().equals(XMaterial.BOOK.parseMaterial())) {
-                    return;
+                if (top.getType().equals(XMaterial.BOOK.parseMaterial()) || bot.getType().equals(XMaterial.BOOK.parseMaterial())) {
+                    if (!EnchantManager.isEnchantmentBook(top) && !EnchantManager.isEnchantmentBook(bot)) {
+                        return;
+                    }
                 }
 
-                if (EnchantManager.isEnchantmentBook(bot)) {
-                    ItemStack item = top.clone();
-                    HashMap<CEnchantment, Integer> botList = EnchantManager.getEnchantmentLevels(bot.getItemMeta().getLore());
-                    HashMap<CEnchantment, Integer> topList = EnchantManager.getEnchantmentLevels(top.getItemMeta().getLore());
+                if (EnchantManager.isEnchantmentBook(top) || EnchantManager.isEnchantmentBook(bot)) {
+                    ItemStack book = EnchantManager.isEnchantmentBook(bot) ? bot : top;
+                    ItemStack item = EnchantManager.isEnchantmentBook(bot) ? top.clone() : bot.clone();
 
-                    if (stackEnchantments) {
-                        if (EnchantManager.isEnchantmentBook(top)) {
-                            for (CEnchantment ce : topList.keySet())
-                                if (botList.containsKey(ce)) {
-                                    int newLevel = botList.get(ce) + topList.get(ce);
+                    HashMap<CEnchantment, Integer> botList = EnchantManager.getEnchantmentLevels(book.getItemMeta().getLore());
+                    HashMap<CEnchantment, Integer> topList = EnchantManager.getEnchantmentLevels(item.getItemMeta().getLore());
 
-                                    if (newLevel > ce.getEnchantmentMaxLevel())
-                                        newLevel = ce.getEnchantmentMaxLevel();
+                    if (stackEnchantments && EnchantManager.isEnchantmentBook(top) && EnchantManager.isEnchantmentBook(bot)) {
+                        for (CEnchantment ce : topList.keySet()) {
+                            if (botList.containsKey(ce)) {
+                                int newLevel = botList.get(ce) + topList.get(ce);
 
-                                    int lvl = ce.getRunecraftCostLevel((newLevel - botList.get(ce)));
-                                    double money = ce.getRunecraftCostMoney((newLevel - botList.get(ce)));
+                                if (newLevel > ce.getEnchantmentMaxLevel())
+                                    newLevel = ce.getEnchantmentMaxLevel();
+
+                                int lvl = ce.getRunecraftCostLevel((newLevel - botList.get(ce)));
+                                double money = ce.getRunecraftCostMoney((newLevel - botList.get(ce)));
+
+                                if (lvl > 0)
+                                    levelCost += lvl;
+                                if (money > 0)
+                                    moneyCost += money;
+
+                                botList.replace(ce, newLevel);
+                            } else {
+                                if (botList.size() < EnchantManager.getMaxEnchants()) {
+                                    int newLevel = topList.get(ce);
+
+                                    int lvl = ce.getRunecraftCostLevel(newLevel);
+                                    double money = ce.getRunecraftCostMoney(newLevel);
 
                                     if (lvl > 0)
                                         levelCost += lvl;
                                     if (money > 0)
                                         moneyCost += money;
 
-                                    botList.replace(ce, newLevel);
+                                    botList.put(ce, newLevel);
                                 } else {
-                                    if (botList.size() < EnchantManager.getMaxEnchants()) {
-                                        int newLevel = topList.get(ce);
-
-                                        int lvl = ce.getRunecraftCostLevel(newLevel);
-                                        double money = ce.getRunecraftCostMoney(newLevel);
-
-                                        if (lvl > 0)
-                                            levelCost += lvl;
-                                        if (money > 0)
-                                            moneyCost += money;
-
-                                        botList.put(ce, newLevel);
-                                    } else
-                                        break;
+                                    break;
                                 }
-                            ItemStack book = EnchantManager.getEnchantBook(botList);
-                            ItemMeta im = book.getItemMeta();
-                            List<String> lore = im.getLore();
-
-                            if (levelCost > 0 || moneyCost > 0) {
-                                lore.add("");
-                                lore.add(getCostString(levelCost, moneyCost));
-                                im.setLore(lore);
-                                book.setItemMeta(im);
                             }
-                            inv.setItem(2, book);
-                            return;
                         }
-                    } else if (EnchantManager.hasEnchantments(top) || EnchantManager.isEnchantmentBook(top)) {
+                        ItemStack resultBook = EnchantManager.getEnchantBook(botList);
+                        ItemMeta im = resultBook.getItemMeta();
+                        List<String> lore = im.getLore();
+
+                        if (levelCost > 0 || moneyCost > 0) {
+                            lore.add("");
+                            lore.add(getCostString(levelCost, moneyCost));
+                            im.setLore(lore);
+                            resultBook.setItemMeta(im);
+                        }
+                        inv.setItem(2, resultBook);
+                        return;
+                    } else if (EnchantManager.isEnchantmentBook(top) && EnchantManager.isEnchantmentBook(bot)) {
                         return;
                     }
 
-                    for (CEnchantment ce : botList.keySet())
+                    for (CEnchantment ce : botList.keySet()) {
                         if (!topList.containsKey(ce) && Tools.isApplicable(item, ce)) {
                             int newLevel = botList.get(ce);
 
@@ -356,6 +370,7 @@ public class RunecraftingHandler {
 
                             item = EnchantManager.addEnchant(item, ce, newLevel);
                         }
+                    }
                     if (EnchantManager.getEnchantments(item.getItemMeta().getLore()).size() > topList.size()) {
                         if (levelCost > 0 || moneyCost > 0) {
                             ItemMeta im = item.getItemMeta();

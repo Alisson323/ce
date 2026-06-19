@@ -67,7 +67,7 @@ public class MenuManager {
     public static Inventory getEnchantmentMenu(Player p, String name) {
         if (!p.isOp() && !p.hasPermission("ce.ench.*")) {
             Inventory lInv = getNextInventory(name);
-            Inventory enchantments = Bukkit.createInventory(null, lInv.getSize(), lInv.getTitle());
+            Inventory enchantments = Bukkit.createInventory(null, lInv.getSize(), Tools.prefix + name);
             enchantments.setContents(lInv.getContents());
             for (int i = 0; i < enchantments.getSize() - 2; i++) {
                 ItemStack checkItem = enchantments.getItem(i);
@@ -98,7 +98,7 @@ public class MenuManager {
     public static Inventory getItemMenu(Player p) {
         if (!p.isOp() && !p.hasPermission("ce.item.*")) {
             Inventory lInv = Main.CEItemMenu;
-            Inventory items = Bukkit.createInventory(null, lInv.getSize(), lInv.getTitle());
+            Inventory items = Bukkit.createInventory(null, lInv.getSize(), Tools.prefix + Translator.get("Menu.Title.Items", "Items"));
             items.setContents(lInv.getContents());
             for (int i = 0; i < items.getSize() - 2; i++) {
                 ItemStack item = items.getItem(i);
